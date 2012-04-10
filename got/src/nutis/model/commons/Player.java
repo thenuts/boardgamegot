@@ -1,5 +1,7 @@
 package nutis.model.commons;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,8 +16,7 @@ public class Player {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Key id;
   private String email;
-//  @OneToMany(mappedBy = "player")
-//  private List<GamePlayer> games;
+  private Date created = new Date();
   
   
   public String getEmail() {
@@ -37,11 +38,12 @@ public class Player {
   }
 
   
-//  public List<GamePlayer> getGames() {
-//    return games;
-//  }
-//  
-//  public void setGames(List<GamePlayer> games) {
-//    this.games = games;
-//  }
+  public Date getCreated() {
+    return created;
+  }
+
+  
+  public void setCreated(Date created) {
+    this.created = created;
+  }
 }

@@ -4,5 +4,9 @@
     
   </ui:style>
   <g:HTMLPanel>
+    Player:<g:InlineLabel ui:field="player"/>
+    <g:FlexTable ui:field="items"/>
+    <g:Label ui:field="mensage"/>
+    <g:Button text="create game" ui:field="createGame" visible="false"/>
   </g:HTMLPanel>
 </ui:UiBinder> 

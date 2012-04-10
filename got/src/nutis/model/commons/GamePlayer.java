@@ -12,25 +12,8 @@ public class GamePlayer {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Key  id;
-  private Game game;
-  private Player player;
-  
-  public Game getGame() {
-    return game;
-  }
-  
-  public void setGame(Game game) {
-    this.game = game;
-  }
-  
-  public Player getPlayer() {
-    return player;
-  }
-  
-  public void setPlayer(Player player) {
-    this.player = player;
-  }
-
+  private Key game;
+  private Key player;
   
   public Key getId() {
     return id;
@@ -39,6 +22,30 @@ public class GamePlayer {
   
   public void setId(Key id) {
     this.id = id;
+  }
+
+
+  
+  public Key getGame() {
+    return game;
+  }
+
+
+  
+  public void setGame(Key game) {
+    this.game = game;
+  }
+
+
+  
+  public Key getPlayer() {
+    return player;
+  }
+
+
+  
+  public void setPlayer(Key player) {
+    this.player = player;
   }
 
   

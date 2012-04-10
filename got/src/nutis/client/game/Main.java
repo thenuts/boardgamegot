@@ -1,19 +1,21 @@
 package nutis.client.game;
 
+import nutis.client.KeyDTO;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 
-public class Map extends Composite {
+public class Main extends Composite {
 
-  private static MapUiBinder uiBinder = GWT.create(MapUiBinder.class);
+  private static MainUiBinder uiBinder = GWT.create(MainUiBinder.class);
 
-  interface MapUiBinder extends UiBinder<Widget, Map> {
+  interface MainUiBinder extends UiBinder<Widget, Main> {
   }
 
-  public Map() {
+  public Main(KeyDTO keyDTO) {
     initWidget(uiBinder.createAndBindUi(this));
   }
 }
