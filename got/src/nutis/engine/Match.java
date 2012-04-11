@@ -1,7 +1,12 @@
-package nutis.model.core;
+package nutis.engine;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import nutis.model.core.House;
+import nutis.model.core.HouseCard;
+import nutis.model.core.Terrain;
+import nutis.model.core.UnitType;
 
 
 public class Match {
@@ -30,7 +35,6 @@ public class Match {
     int[][] supplyTrack = new int[][]{{2,2},{3,2},{3,2,2},{3,2,2,2},{3,3,2,2},{4,3,2,2},{4,3,2,2,2} };
     int[] kingsCourt = new int[]{3,3,2,1,0,0};
     
-    //TODO rever esses valores iniciais
     House stark = new House("Stark",2,3,3,2);
     House greyjoy = new House("Greyjoy",3,5,1,4);
     House lanister = new House("Lannister",3,2,5,1);

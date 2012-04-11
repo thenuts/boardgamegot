@@ -48,7 +48,7 @@ public class Games extends Composite {
         }
         
         player.setText(result.getPlayer());
-        if("test@example.com".equals(result.getPlayer())){
+        if("oguilherme@gmail.com".equals(result.getPlayer())){
           createGame.setVisible(true);
         }
         if(result.getGames()==null){

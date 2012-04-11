@@ -29,6 +29,8 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
   private static final EntityManagerFactory emfInstance = Persistence
       .createEntityManagerFactory("transactions-optional");
 
+  
+  @Override
   public InitializeResultDTO initialize() {
     InitializeResultDTO result = new InitializeResultDTO();
     try {
@@ -45,6 +47,31 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
       e.printStackTrace();
     }
     return result;
+  }
+  
+  @Override
+  public void createGame() {
+    try {
+      EntityManager em = emfInstance.createEntityManager();
+      try {
+        em.getTransaction().begin();
+        Game game = new Game();
+        game.setName("jogo "+Integer.toString((int)(Math.random()*100)));
+        em.persist(game);
+        em.getTransaction().commit();
+        addPlayerToGame(em, game, "oguilherme@gmail.com");
+        addPlayerToGame(em, game, "divino.passos@ilinkbr.com");
+        addPlayerToGame(em, game, "claudao@gmail.com");
+        addPlayerToGame(em, game, "wconrad@terra.com.br");
+        addPlayerToGame(em, game, "tiago.caux@gmail.com");
+        //wconrad@terra.com.br
+      } finally {
+        em.close();
+      }
+    } catch (Exception e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -95,99 +122,13 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
   private String getPlayer() {
     UserService userService = UserServiceFactory.getUserService();
     if (userService.getCurrentUser() != null) {
-      return userService.getCurrentUser().getNickname();
+      return userService.getCurrentUser().getEmail();
     } else {
       throw new IllegalStateException("este serviço não deveria ter sido chamada sem que o usuário esteja logado");
     }
   }
-  // private void testGameRelation(EntityManager em) {
-  // em.getTransaction().begin();
-  // Game game = new Game();
-  // game.setName("primeiro jogo");
-  // em.persist(game);
-  // em.getTransaction().commit();
-  // em.getTransaction().begin();
-  // Player player1 = new Player();
-  // player1.setEmail("player1");
-  // em.persist(player1);
-  // em.getTransaction().commit();
-  // em.getTransaction().begin();
-  // Player player2 = new Player();
-  // player2.setEmail("player2");
-  // em.persist(player2);
-  // em.getTransaction().commit();
-  // em.getTransaction().begin();
-  // GamePlayer aux = new GamePlayer();
-  // aux.setGame(game.getId());
-  // aux.setPlayer(player1.getId());
-  // em.persist(aux);
-  // em.getTransaction().commit();
-  // // aux = new GamePlayer();
-  // // aux.setGame(game);
-  // // aux.setPlayer(player2);
-  // // em.persist(aux);
-  // // em.getTransaction().commit();
-  // }
-  // private String counterLogic(EntityManager em) throws Exception {
-  // List<?> result = em.createQuery("select from GreetingCounter").getResultList();
-  // int size = result.size();
-  // GreetingCounter counter;
-  // em.getTransaction().begin();
-  // if (size == 0) {
-  // counter = new GreetingCounter();
-  // counter.setCounter(1);
-  // em.persist(counter);
-  //
-  //
-  // } else {
-  // counter = (GreetingCounter) result.get(0);
-  // counter.setCounter(counter.getCounter() + 1);
-  // em.flush();
-  // }
-  // em.getTransaction().commit();
-  // UserService userService = UserServiceFactory.getUserService();
-  // if (userService.getCurrentUser() != null) {
-  // return ("Bem vindo " + userService.getCurrentUser().getNickname() + " - " + counter.getCounter() + "(" + size +
-  // ")");
-  // } else {
-  // throw new Exception("este serviço não deveria ter sido chamada sem que o usuário esteja logado");
-  // }
-  // }
-  // /**
-  // * Escape an html string. Escaping data received from the client helps to prevent cross-site script vulnerabilities.
-  // *
-  // * @param html
-  // * the html string to escape
-  // * @return the escaped string
-  // */
-  // private String escapeHtml(String html) {
-  // if (html == null) {
-  // return null;
-  // }
-  // return html.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
-  // }
 
-  @Override
-  public void createGame() {
-    try {
-      EntityManager em = emfInstance.createEntityManager();
-      try {
-        em.getTransaction().begin();
-        Game game = new Game();
-        game.setName("jogo "+Integer.toString((int)(Math.random()*100)));
-        em.persist(game);
-        em.getTransaction().commit();
-        addPlayerToGame(em, game, "test@example.com");
-        addPlayerToGame(em, game, "test2@example.com");
-        addPlayerToGame(em, game, "test3@example.com");
-      } finally {
-        em.close();
-      }
-    } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
+
 
   private void addPlayerToGame(EntityManager em, Game game, String email) {
     Player player = readPlayer(email, em);

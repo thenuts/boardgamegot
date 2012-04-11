@@ -3,6 +3,22 @@
   <ui:style>
     
   </ui:style>
-  <g:HTMLPanel>
-  </g:HTMLPanel>
+  <!-- <g:ScrollPanel> -->
+  <!-- <g:Image url="/images/agot_pbem_map_5p_full.png" /> -->
+  <!-- <g:Button></g:Button> -->
+  <!-- </g:ScrollPanel> -->
+  <g:DockLayoutPanel unit="PX" ui:field="Dock">
+    <!-- the g: north, west, east, south guys go here -->
+    <g:east size="100">
+      <g:HorizontalPanel>
+        <g:Button ui:field="planning" text="planning" />
+      </g:HorizontalPanel>
+
+    </g:east>
+    <g:center>
+      <g:ScrollPanel>
+        <g:Image url="/images/agot_pbem_map_5p_full.png"/>
+      </g:ScrollPanel>
+    </g:center>
+  </g:DockLayoutPanel>
 </ui:UiBinder> 
