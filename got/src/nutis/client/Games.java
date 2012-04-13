@@ -1,5 +1,7 @@
 package nutis.client;
 
+import nutis.client.dto.GameDto;
+import nutis.client.dto.InitializeResultDto;
 import nutis.client.game.Main;
 
 import com.google.gwt.core.client.GWT;
@@ -39,10 +41,10 @@ public class Games extends Composite {
   }
 
   private void initialize() {
-    service.initialize( new DefaultAsyncCallback<InitializeResultDTO>() {
+    service.initialize( new DefaultAsyncCallback<InitializeResultDto>() {
       
       @Override
-      public void onSuccess(InitializeResultDTO result) {
+      public void onSuccess(InitializeResultDto result) {
         if(result==null){          
           throw new IllegalStateException("initialize return null");
         }
@@ -56,7 +58,7 @@ public class Games extends Composite {
         }
         else{
           int i=0;
-          for(final GameDTO game:result.getGames()){
+          for(final GameDto game:result.getGames()){
             Anchor gameLink = new Anchor(game.getName());
             gameLink.addClickHandler(new ClickHandler() {              
               @Override

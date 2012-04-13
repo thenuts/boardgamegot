@@ -4,9 +4,15 @@
     
   </ui:style>
   <g:HTMLPanel>
-    <g:FlexTable ui:field="orders"/>
-    <g:Button ui:field="save" text="save" />
-<!--   land,units,(combo)order -->
-<!-- button  -->
+    <g:DockLayoutPanel unit="PX" width="400px" height="100px">
+      <g:east size="100">
+        <g:ListBox ui:field="orders" multipleSelect="true"/>
+      </g:east>
+      <g:center>
+        <g:VerticalPanel ui:field="lands" />
+      </g:center>
+    </g:DockLayoutPanel>
+
+    <g:Button ui:field="save" text="save"/>
   </g:HTMLPanel>
 </ui:UiBinder> 

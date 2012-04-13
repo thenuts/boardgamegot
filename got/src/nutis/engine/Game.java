@@ -3,55 +3,55 @@ package nutis.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.OneToMany;
+
+import nutis.model.core.Aliance;
+import nutis.model.core.GameMap;
 import nutis.model.core.House;
-import nutis.model.core.HouseCard;
-import nutis.model.core.Terrain;
-import nutis.model.core.UnitType;
+import nutis.model.core.WestrosCard;
+import nutis.model.core.map.GameMap2003;
+import nutis.model.persist.AlianceRecord;
+import nutis.model.persist.GameRecord;
+import nutis.model.persist.HouseRecord;
 
 
-public class Match {
+public class Game {
   enum Phase{
     
   };
   Phase phase;
   House house;
   
+  List<House> houses;
+  GameMap map;
   
-  void inicializar(){
-    //define players
-    //define mapa
-    //define cartas
-    //define westross
-    
-    List<Terrain> lands = new ArrayList<Terrain>();
-    //TODO inicializar terrenos
-   // lands.add(new Land("teste",1,0,0,null)); //,new Land[] {new Land(),new Land()}));
-    
-    UnitType eyre = new UnitType("Eyre",6,false);
-    UnitType sunspear = new UnitType("Sunspear",5,false);
-    UnitType kingsLanding = new UnitType("KingsLanding",5,false);
-    
-    //TODO essas variaveis são alteradas quando muda o numero de jogadores
-    int[][] supplyTrack = new int[][]{{2,2},{3,2},{3,2,2},{3,2,2,2},{3,3,2,2},{4,3,2,2},{4,3,2,2,2} };
-    int[] kingsCourt = new int[]{3,3,2,1,0,0};
-    
-    House stark = new House("Stark",2,3,3,2);
-    House greyjoy = new House("Greyjoy",3,5,1,4);
-    House lanister = new House("Lannister",3,2,5,1);
-    House baratheon = new House("Baratheon",3,1,4,3);
-    House tyrell = new House("Tyrell",3,4,2,5);
-    //House martell = new House("Martell",3,6,6,6);
-    
-    //TODO os sets de carta variam pelo numero de jogadores e a expansão sendo usada, implementar essas variacoes
-    List<HouseCard> cardsStark; 
-    List<HouseCard> cardsGreyJoy;
-    List<HouseCard> cardsLanister; 
-    List<HouseCard> cardsBaratheon; 
-    List<HouseCard> cardsTyrell;
-    List<HouseCard> cardsMartell;
-//    List<Integer[]> supplyTrack = new ArrayList<Integer[]>();
-//    supplyTrack.add(new ArrayList<Integer>(new int[] {1,2));
-    
+  private String name;
+  
+  private int turn;
+  private int wildlings;
+  private WestrosCard card1;
+  private WestrosCard card2;
+  private WestrosCard card3;
+  private List<Aliance> aliances = new ArrayList<Aliance>();  
+  
+  public Game(GameMap map){
+    this.map=map;
+  }
+  
+  public Game(GameRecord gameRecord) {
+    map = new GameMap2003();
+    this.name = gameRecord.getName();
+    this.turn = gameRecord.getTurn();
+    this.wildlings = gameRecord.getWildlings();
+    houses = new ArrayList<House>();
+    for(HouseRecord house:gameRecord.getHouses()){
+      houses.add(House.fromRecord(house,map));
+    }
+  }
+
+  public void initialize(){
+    houses = map.initializeHouses();    
   }
   
   void begin(){
@@ -182,6 +182,24 @@ public class Match {
   
   void initWestrosPhase(){
     
+  }
+
+  
+  public List<House> getHouses() {
+    return houses;
+  }
+
+  
+  public GameMap getMap() {
+    return map;
+  }
+
+  public GameRecord getRecord() {
+    GameRecord result = new GameRecord();
+    for (House house : getHouses()) {
+      result.getHouses().add(house.getRecord());
+    }
+    return result;
   }
   
 }

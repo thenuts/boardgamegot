@@ -8,9 +8,11 @@
         <provider>org.datanucleus.store.appengine.jpa.DatastorePersistenceProvider</provider>
         <properties>
             <property name="datanucleus.NontransactionalRead" value="true"/>
-            <property name="datanucleus.NontransactionalWrite" value="true"/>
+            <property name="datanucleus.NontransactionalWrite" value="false"/>
             <property name="datanucleus.ConnectionURL" value="appengine"/>  
-            <property name="datanucleus.appengine.datastoreReadConsistency" value="STRONG" /> 
+            <property name="datanucleus.appengine.datastoreReadConsistency" value="STRONG" />
+            <!-- desliga o warning de eager loading aonde só é possivel lazy --> 
+            <property name="datanucleus.appengine.ignorableMetaDataBehavior" value="NONE" /> 
 <!--             <property name="javax.persistence.query.timeout" value="5000" /> -->
 <!--             <property name="datanucleus.datastoreWriteTimeout" value="10000" /> -->
         </properties>

@@ -3,33 +3,34 @@ package nutis.model.core;
 import java.util.ArrayList;
 import java.util.List;
 
+import nutis.model.persist.HouseRecord;
+import nutis.model.persist.UnitRecord;
+
+import com.google.appengine.api.datastore.Key;
+
 
 public class House {
-  private String name;
+  
   private int powerTokens; //limit 20
   private int supplyTrack;
   private int ironThrone;
   private int fifdoms;
   private int kingCourt;
+  private HouseType type;
   private List<HouseCard> cards=new ArrayList<HouseCard>();
+  private List<HouseCard> descartedCards=new ArrayList<HouseCard>();
   private List<Unit> units=new ArrayList<Unit>();
+  private List<OrderIssued> orders=new ArrayList<OrderIssued>();
+  private Key player;
 
-  public House(String name, int supplyTrack, int ironThrone, int fifdoms, int kingCourt) {
-    this.name=name;
+  public House(HouseType type, int supplyTrack, int ironThrone, int fifdoms, int kingCourt) {
+    this.type=type;
     this.supplyTrack=supplyTrack;
     this.ironThrone=ironThrone;
     this.fifdoms=fifdoms;
     this.kingCourt=kingCourt;
     
     powerTokens=5;
-  }
-  
-  public String getName() {
-    return name;
-  }
-  
-  public void setName(String name) {
-    this.name = name;
   }
   
   public int getPowerTokens() {
@@ -71,27 +72,75 @@ public class House {
   public void setKingCourt(int kingCourt) {
     this.kingCourt = kingCourt;
   }
-  
+
   public List<HouseCard> getCards() {
     return cards;
   }
-  
-  public void setCards(List<HouseCard> cards) {
-    this.cards = cards;
-  }
 
-  
+  public List<HouseCard> getDescartedCards() {
+    return descartedCards;
+  }
+    
   public List<Unit> getUnits() {
     return units;
   }
 
-  
-  public void setUnits(List<Unit> units) {
-    this.units = units;
-  }
-
   public void addUnit(UnitType unitType, Terrain terrain) {
     new Unit(unitType,terrain,this);
+  }
+  
+  public HouseRecord getRecord() {
+    HouseRecord result = new HouseRecord();
+    result.setPowerTokens(this.getPowerTokens());
+    result.setIronThrone(this.getIronThrone());
+    result.setFifdoms(this.getFifdoms());
+    result.setKingCourt(this.getKingCourt());
+    result.setSupplyTrack(this.getSupplyTrack());
+    result.setHouse(this.getType().getId());
+    for(HouseCard card:this.getCards()){
+      result.getCards().add(card.getId());
+    }
+    for(HouseCard card:this.getDescartedCards()){
+      result.getDescartedCards().add(card.getId());
+    }
+    for(Unit unit:this.getUnits()){
+      result.getUnits().add(unit.getRecord());
+    }
+    for(OrderIssued order:this.getOrders()){
+      result.getOrders().add(order.getRecord());
+    }
     
-  } 
+    return result;
+  }
+
+  
+  public List<OrderIssued> getOrders() {
+    return orders;
+  }
+
+  public static House fromRecord(HouseRecord house,GameMap map) {
+    House result = new House(map.getHouseTypes().get(house.getHouse()), house.getSupplyTrack(), 
+        house.getIronThrone(), house.getFifdoms(), house.getKingCourt());
+    result.setPlayer(house.getPlayer());
+    for(UnitRecord unit:house.getUnits()){
+      result.addUnit(map.getUnitTypes().get(unit.getType()), map.getLands().get(unit.getTerrain()));
+    }
+    return result;
+  }
+
+  
+  public HouseType getType() {
+    return type;
+  }
+
+  
+  public Key getPlayer() {
+    return player;
+  }
+
+  
+  public void setPlayer(Key player) {
+    this.player = player;
+  }
+
 }

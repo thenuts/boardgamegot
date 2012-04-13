@@ -1,19 +1,19 @@
-package nutis.model.commons;
+package nutis.model.persist;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import nutis.model.persist.Aliance;
-import nutis.model.persist.House;
+import javax.persistence.OneToMany;
 
 import com.google.appengine.api.datastore.Key;
 
 @Entity
-public class Game {
+public class GameRecord {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Key id;
@@ -22,12 +22,14 @@ public class Game {
   private int turn;
   private int phase;
   private int wildlings;
-  private int House;
-  private int card1;
-  private int card2;
-  private int card3;
-  private List<House> houses;
-  private List<Aliance> aliances;  
+  private Integer house;
+  private Integer card1;
+  private Integer card2;
+  private Integer card3;
+  @OneToMany(cascade={CascadeType.PERSIST}, mappedBy="game")
+  private List<HouseRecord> houses = new ArrayList<HouseRecord>();
+  @OneToMany(cascade=CascadeType.PERSIST)
+  private List<AlianceRecord> aliances = new ArrayList<AlianceRecord>();
   
   public String getName() {
     return name;
@@ -78,12 +80,12 @@ public class Game {
 
   
   public int getHouse() {
-    return House;
+    return house;
   }
 
   
   public void setHouse(int house) {
-    House = house;
+    this.house = house;
   }
 
   
@@ -117,22 +119,22 @@ public class Game {
   }
 
   
-  public List<House> getHouses() {
+  public List<HouseRecord> getHouses() {
     return houses;
   }
 
   
-  public void setHouses(List<House> houses) {
+  public void setHouses(List<HouseRecord> houses) {
     this.houses = houses;
   }
 
   
-  public List<Aliance> getAliances() {
+  public List<AlianceRecord> getAliances() {
     return aliances;
   }
 
   
-  public void setAliances(List<Aliance> aliances) {
+  public void setAliances(List<AlianceRecord> aliances) {
     this.aliances = aliances;
   }
 

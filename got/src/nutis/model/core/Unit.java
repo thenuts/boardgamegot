@@ -1,5 +1,7 @@
 package nutis.model.core;
 
+import nutis.model.persist.UnitRecord;
+
 
 public class Unit {
    private House house;
@@ -50,5 +52,13 @@ public class Unit {
   
   public void setTerrain(Terrain terrain) {
     this.terrain = terrain;
+  }
+
+  public UnitRecord getRecord() {
+    UnitRecord result = new UnitRecord();
+    result.setDefeated(this.isDefeated());
+    result.setType(this.getType().getId());
+    result.setTerrain(this.getTerrain().getId());
+    return result;
   }
 }

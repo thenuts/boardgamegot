@@ -1,5 +1,10 @@
 package nutis.client;
 
+import nutis.client.dto.InitializeResultDto;
+import nutis.client.dto.KeyDto;
+import nutis.client.dto.LoadGameResultDto;
+import nutis.client.dto.PossibleOrdersResultDto;
+
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -9,7 +14,13 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("common")
 public interface CommonService extends RemoteService {
 
-  InitializeResultDTO initialize();
+  InitializeResultDto initialize();
 
   void createGame();
+
+  LoadGameResultDto loadGame(KeyDto gameKey);
+
+  PossibleOrdersResultDto getPossibleOrders(KeyDto gameKey);
+
+  void sendOrders(KeyDto gameKey);
 }

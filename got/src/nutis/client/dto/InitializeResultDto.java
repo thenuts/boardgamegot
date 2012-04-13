@@ -1,21 +1,21 @@
-package nutis.client;
+package nutis.client.dto;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class InitializeResultDTO  implements Serializable {
+public class InitializeResultDto  implements Serializable {
   
   private static final long serialVersionUID = -4207667867127807432L;
   
-  private ArrayList<GameDTO> games;
+  private ArrayList<GameDto> games;
   private String player;
   
-  public ArrayList<GameDTO> getGames() {
+  public ArrayList<GameDto> getGames() {
     return games;
   }
   
-  public void setGames(ArrayList<GameDTO> games) {
+  public void setGames(ArrayList<GameDto> games) {
     this.games = games;
   }
   

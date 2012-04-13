@@ -2,6 +2,7 @@ package nutis.model.core;
 
 
 public class HouseCard {
+  private int id;
    private House house;
    private int power;
    private String name;
@@ -9,7 +10,8 @@ public class HouseCard {
    private int sword;
    private String text;
   
-  public HouseCard(int power, String name, int sword, int fortification, String text) {
+  public HouseCard(int id, int power, String name, int sword, int fortification, String text) {
+    this.id=id;
     this.power=power;
     this.name=name;
     this.sword=sword;
@@ -67,6 +69,16 @@ public class HouseCard {
   
   public void setName(String name) {
     this.name = name;
+  }
+
+  
+  public int getId() {
+    return id;
+  }
+
+  
+  public void setId(int id) {
+    this.id = id;
   }
    
    //TODO implementar algum mecanimos generico do poder, provavelmente um metodo com acesso ao math e battle 

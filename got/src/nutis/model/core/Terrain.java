@@ -1,38 +1,47 @@
 package nutis.model.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 
 public class Terrain {
+   int id;
    private String name;
    private int mustering;
    private int crowns;
    private int barrels;
-   private House capital; 
+   private HouseType capital; 
    private House owner; 
-   private List<Unit> units;
-   private List<Terrain> neighbourhood;
+   private boolean ocean;
+   private List<Unit> units = new ArrayList<Unit>();
+   private List<Terrain> neighbourhood = new ArrayList<Terrain>();
+   private int x;
+   private int y;
   
-   public Terrain(String name, int mustering, int crowns, int barrels, House capital) {
-     this(false,name,mustering,crowns,barrels,capital);
+   public Terrain(int id,String name, int mustering, int crowns, int barrels, HouseType capital,int x, int y) {
+     this(id,false,name,mustering,crowns,barrels,capital,x,y);
    }
    
-   public Terrain(String name) {
-     this(true,name,0,0,0,null);
+   public Terrain(int id,String name,int x, int y) {
+     this(id,true,name,0,0,0,null,x,y);
    }
    
-   public Terrain(boolean ocean,String name, int mustering, int crowns, int barrels, House capital) {
-     // TODO Auto-generated constructor stub
+   public Terrain(int id,boolean ocean,String name, int mustering, int crowns, int barrels, HouseType capital,int x, int y) {
+     this.id=id;
+     this.ocean=ocean;
+     this.name=name;
+     this.mustering=mustering;
+     this.crowns=crowns;
+     this.barrels=barrels;
+     this.capital=capital;
+     this.x=x;
+     this.y=y;
    }
 
   public String getName() {
     return name;
-  }
-  
-  public void setName(String name) {
-    this.name = name;
   }
   
   public int getMustering() {
@@ -71,36 +80,51 @@ public class Terrain {
     return units;
   }
   
-  public void setUnits(List<Unit> units) {
-    this.units = units;
-  }
-  
   public Collection<Terrain> getNeighbourhood() {    
     return Collections.unmodifiableCollection(neighbourhood);
   }
   
-  public void addNeighbourhood(Terrain[] newNeighbours) {
-    for (Terrain neighbour:newNeighbours){
-      addNeighbour(neighbour);
-    }
-  }
+//  public void addNeighbourhood(Terrain[] newNeighbours) {
+//    for (Terrain neighbour:newNeighbours){
+//      addNeighbour(neighbour);
+//    }
+//  }
 
   public void addNeighbour(Terrain neighbour) {
     if(!neighbourhood.contains(neighbour)){
       neighbourhood.add(neighbour);
       if(!neighbour.getNeighbourhood().contains(this)){
-        neighbour.addNeighbourhood(new Terrain[] {neighbour });
+        neighbour.addNeighbour(neighbour );
       }
     }
   }
-
   
-  public House getCapital() {
+  public HouseType getCapital() {
     return capital;
   }
 
   
-  public void setCapital(House capital) {
-    this.capital = capital;
+  public int getId() {
+    return id;
   }
+
+  
+  public boolean isOcean() {
+    return ocean;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
+  
+  public int getX() {
+    return x;
+  }
+
+  
+  public int getY() {
+    return y;
+  }
+
 }

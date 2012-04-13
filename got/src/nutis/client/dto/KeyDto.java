@@ -1,15 +1,20 @@
-package nutis.client;
+package nutis.client.dto;
 
 import java.io.Serializable;
 
 
-public class KeyDTO implements Serializable {
+public class KeyDto implements Serializable {
   
   private static final long serialVersionUID = 4991075764915324218L;
   
   private String kind;
   private long id;
   
+//  public KeyDTO(Key id) {
+//    this.id = id.getId();
+//    this.kind = id.getKind();
+//  }
+
   public String getKind() {
     return kind;
   }

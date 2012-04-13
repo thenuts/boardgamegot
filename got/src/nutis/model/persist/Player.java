@@ -1,4 +1,4 @@
-package nutis.model.commons;
+package nutis.model.persist;
 
 import java.util.Date;
 
