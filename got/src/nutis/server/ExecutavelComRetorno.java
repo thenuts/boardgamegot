@@ -1,15 +1,22 @@
 package nutis.server;
 
+import javax.persistence.EntityManager;
+
+import nutis.client.dto.RetornoPadraoDTO;
+
 
 public abstract class ExecutavelComRetorno {
 
   protected RetornoPadraoDTO retorno;
+  protected EntityManager em;
 
-  // TODO Documentacao obrigatorio intanciar o retorno
-  // TODO: Documetação, esta estrutura foi copiada pra a classe MenuServiceImpl, centralizar posteriormente
   public abstract RetornoPadraoDTO execute();
 
   public RetornoPadraoDTO getRetorno() {
     return retorno;
+  }
+
+  public void setEntityManager(EntityManager em) {
+    this.em=em;
   }
 }

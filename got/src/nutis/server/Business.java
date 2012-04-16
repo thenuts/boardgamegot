@@ -1,42 +1,54 @@
 package nutis.server;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+import nutis.client.dto.RetornoPadraoDTO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Business {
+
   final static Logger logger = LoggerFactory.getLogger(Business.class);
-  private Business(){
+  private static final EntityManagerFactory emfInstance = Persistence
+      .createEntityManagerFactory("transactions-optional");
+
+  private Business() {
   }
   
-//  /**
-//   * Método requisitados para operações com mensagem de erro capturada na excessão
-//   * @param executavel - Classe anômica com o método que irá executar
-//   * @return {@link RetornoPadraoDTO}
-//   */
-//  public static RetornoPadraoDTO execute(Executavel executavel) {
-//    RetornoPadraoDTO retorno = new RetornoPadraoDTO();
-//    try {
-//      executavel.execute();
-//    } catch (RuntimeException e) {
-//      retorno.setMensagemDeErro(e.getMessage().split("\n"));
-//      logger.error(e.getMessage(), e);
-//    }
-//    return retorno;
-//  }
-
   /**
-   * <p>Método requisitados para operações com mensagem e outros dados que outros dados que forem necessários.</p>
-   * <p>Para isso, uma nova classe deverá ser criado com essas propriedades, herdando de {@link RetornoPadraoDTO}</p>
-   * @param executavel - Classe anômica com o método que irá executar
+   * <p>
+   * Método requisitados para operações com mensagem e outros dados que outros dados que forem necessários.
+   * </p>
+   * <p>
+   * Para isso, uma nova classe deverá ser criado com essas propriedades, herdando de {@link RetornoPadraoDTO}
+   * </p>
+   * 
+   * @param executavel
+   *          - Classe anômica com o método que irá executar
    * @return {@link RetornoPadraoDTO}
    */
-  public static RetornoPadraoDTO execute(ExecutavelComRetorno run) {
+  //TODO estranho esse uncecked pois o RetornoPadraoDTO esta no extends do T 
+  @SuppressWarnings("unchecked")
+  public static <T extends RetornoPadraoDTO> T execute(ExecutavelComRetorno run) {
+    EntityManager em = null;
     try {
+      em = emfInstance.createEntityManager();
+      run.setEntityManager(em);
       run.execute();
-    } catch (RuntimeException e) {
+    } catch (Throwable e) {
       run.getRetorno().setMensagemDeErro(e.getMessage().split("\n"));
       logger.error(e.getMessage(), e);
+    } finally {
+      if (em != null) {
+        if (em.getTransaction().isActive()) {
+          em.getTransaction().rollback();
+        }
+        em.close();
+      }
     }
-    return run.getRetorno();
+    return (T) run.getRetorno();
   }
 }

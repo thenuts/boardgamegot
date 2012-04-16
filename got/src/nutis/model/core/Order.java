@@ -52,7 +52,7 @@ public class Order {
     OrderDto result = new OrderDto();
     result.setId(this.getId());
     result.setStar(this.isStar());
-    result.setName(this.getName()+(this.getValue()!=null?" "+this.getValue():""));
+    result.setName(this.getName()+(this.getValue()!=null?" "+this.getValue():"")+(this.isStar()?"*":""));
     return result;
   }
 }

@@ -2,6 +2,7 @@ package nutis.client;
 
 import nutis.client.dto.GameDto;
 import nutis.client.dto.InitializeResultDto;
+import nutis.client.dto.RetornoPadraoDTO;
 import nutis.client.game.Main;
 
 import com.google.gwt.core.client.GWT;
@@ -78,10 +79,10 @@ public class Games extends Composite {
   
   @UiHandler("createGame")
   void handleClick(ClickEvent e) {
-    service.createGame( new DefaultAsyncCallback<Void>() {
+    service.createGame( new DefaultAsyncCallback<RetornoPadraoDTO>() {
       
       @Override
-      public void onSuccess(Void result) {
+      public void onSuccess(RetornoPadraoDTO result) {
         initialize();        
       }
     });

@@ -21,9 +21,6 @@
       <g:ScrollPanel>
         <g:HTMLPanel ui:field="canvasPlace">
           <g:Image url="/images/agot_pbem_map_5p_full.png" ui:field="map" visible="false"/>
-          <g:Image url="/images/piece1.png" ui:field="footman" visible="false"/>
-          <g:Image url="/images/piece2.png" ui:field="knigth" visible="false"/>
-          <g:Image url="/images/piece3.png" ui:field="ship" visible="false"/>
         </g:HTMLPanel>
       </g:ScrollPanel>
     </g:center>

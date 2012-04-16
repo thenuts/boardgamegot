@@ -1,4 +1,4 @@
-package nutis.server;
+package nutis.client.dto;
 
 import java.io.Serializable;
 

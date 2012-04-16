@@ -3,17 +3,15 @@ package nutis.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.OneToMany;
-
 import nutis.model.core.Aliance;
 import nutis.model.core.GameMap;
 import nutis.model.core.House;
 import nutis.model.core.WestrosCard;
 import nutis.model.core.map.GameMap2003;
-import nutis.model.persist.AlianceRecord;
 import nutis.model.persist.GameRecord;
 import nutis.model.persist.HouseRecord;
+
+import com.google.appengine.api.datastore.Key;
 
 
 public class Game {
@@ -187,6 +185,17 @@ public class Game {
   
   public List<House> getHouses() {
     return houses;
+  }
+
+  public House getHouse(Key key) {
+    House result=null;
+    for(House house:houses){
+      if(house.getPlayer().equals(key)){
+        result = house;
+        break;
+      }
+    }
+    return result;
   }
 
   

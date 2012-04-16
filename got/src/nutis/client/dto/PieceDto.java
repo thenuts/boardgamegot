@@ -9,7 +9,7 @@ public class PieceDto implements Serializable{
   
   //TODO no futuro esta classe representa´ra peças individuais, hoje elas estao agrupadas por terreno e house
   
-  private String terrain;
+//  private String terrain;
   private int terrainId;
   private String house;
   private String piecesText;
@@ -17,13 +17,13 @@ public class PieceDto implements Serializable{
   private int x;
   private int y;
   
-  public String getTerrain() {
-    return terrain;
-  }
-  
-  public void setTerrain(String terrain) {
-    this.terrain = terrain;
-  }
+//  public String getTerrain() {
+//    return terrain;
+//  }
+//  
+//  public void setTerrain(String terrain) {
+//    this.terrain = terrain;
+//  }
   
   public String getHouse() {
     return house;

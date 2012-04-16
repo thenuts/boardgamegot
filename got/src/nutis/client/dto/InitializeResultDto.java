@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 
-public class InitializeResultDto  implements Serializable {
+
+public class InitializeResultDto extends RetornoPadraoDTO implements Serializable {
   
   private static final long serialVersionUID = -4207667867127807432L;
   
