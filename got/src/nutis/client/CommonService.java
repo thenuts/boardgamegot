@@ -1,5 +1,7 @@
 package nutis.client;
 
+import java.util.HashMap;
+
 import nutis.client.dto.InitializeResultDto;
 import nutis.client.dto.KeyDto;
 import nutis.client.dto.LoadGameResultDto;
@@ -23,5 +25,5 @@ public interface CommonService extends RemoteService {
 
   PossibleOrdersResultDto getPossibleOrders(KeyDto gameKey);
 
-  RetornoPadraoDTO sendOrders(KeyDto gameKey);
+  RetornoPadraoDTO sendOrders(KeyDto gameKey, HashMap<Integer, Integer> internalOrders);
 }

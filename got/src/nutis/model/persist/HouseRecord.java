@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,15 +28,15 @@ public class HouseRecord {
   private int kingCourt;
   private Integer bid;
   private Integer combatCard;
-  @OneToMany(cascade=CascadeType.PERSIST)
+  @OneToMany(cascade=CascadeType.PERSIST, mappedBy="house")
   private List<Integer> cards= new ArrayList<Integer>();
-  @OneToMany(cascade=CascadeType.PERSIST)
+  @OneToMany(cascade=CascadeType.PERSIST, mappedBy="house")
   private List<Integer> descartedCards= new ArrayList<Integer>();
-  @OneToMany(cascade=CascadeType.PERSIST)
+  @OneToMany(cascade=CascadeType.PERSIST, mappedBy="house")
   private List<UnitRecord> units= new ArrayList<UnitRecord>();
-  @OneToMany(cascade=CascadeType.PERSIST)
+  @OneToMany(cascade=CascadeType.PERSIST, mappedBy="house")
   private List<OrderRecord> orders= new ArrayList<OrderRecord>();
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   private GameRecord game;
   
   public Key getPlayer() {

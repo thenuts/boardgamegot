@@ -11,6 +11,7 @@ import nutis.client.dto.KeyDto;
 import nutis.client.dto.OrderDto;
 import nutis.client.dto.PieceDto;
 import nutis.client.dto.PossibleOrdersResultDto;
+import nutis.client.dto.RetornoPadraoDTO;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
@@ -152,14 +153,14 @@ public class Planning extends DecoratedPopupPanel {
   @UiHandler("save")
   void saveClick(ClickEvent e) {
     hide();
-    // service.sendOrders(gameKey, new DefaultAsyncCallback<Void>() {
-    //
-    // @Override
-    // public void onSuccess(Void result) {
-    // // TODO fechar popup
-    //
-    // }
-    //
-    // });
+     service.sendOrders(gameKey,internalOrders, new DefaultAsyncCallback<RetornoPadraoDTO>() {
+    
+     @Override
+     public void onSuccess(RetornoPadraoDTO result) {
+     // TODO fechar popup
+    
+     }
+    
+     });
   }
 }

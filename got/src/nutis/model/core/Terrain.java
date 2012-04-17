@@ -3,6 +3,7 @@ package nutis.model.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -17,6 +18,7 @@ public class Terrain {
    private boolean ocean;
    private List<Unit> units = new ArrayList<Unit>();
    private List<Terrain> neighbourhood = new ArrayList<Terrain>();
+   private OrderIssued order;
    private int x;
    private int y;
   
@@ -126,5 +128,16 @@ public class Terrain {
   public int getY() {
     return y;
   }
+
+  
+  public OrderIssued getOrder() {
+    return order;
+  }
+
+  
+  public void setOrder(OrderIssued order) {
+    this.order = order;
+  }
+
 
 }

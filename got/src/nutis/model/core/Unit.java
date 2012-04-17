@@ -18,6 +18,10 @@ public class Unit {
     terrain.getUnits().add(this);
     house.getUnits().add(this);
   }
+  
+  public int getPieceId(){
+    return (house.getType().getId() - 1) * 4 + type.getId() - 1;
+  }
 
   public House getHouse() {
     return house;

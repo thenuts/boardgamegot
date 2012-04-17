@@ -39,7 +39,11 @@ public class Business {
       run.setEntityManager(em);
       run.execute();
     } catch (Throwable e) {
-      run.getRetorno().setMensagemDeErro(e.getMessage().split("\n"));
+      if(e.getMessage()!=null){
+        run.getRetorno().setMensagemDeErro(e.getMessage().split("\n"));
+      }
+      //TODO logger não esta funcionando no ambiente de desenvolvimento, analisar 
+      System.out.println(e.getMessage());
       logger.error(e.getMessage(), e);
     } finally {
       if (em != null) {

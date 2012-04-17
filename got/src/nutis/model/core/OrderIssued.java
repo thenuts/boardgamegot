@@ -6,6 +6,7 @@ import nutis.model.persist.OrderRecord;
 public class OrderIssued {
   Order type;
   Terrain terrain;
+  House house;
   public OrderRecord getRecord() {
     OrderRecord result = new OrderRecord();
     result.setOrder(this.getType().getId());
@@ -27,5 +28,15 @@ public class OrderIssued {
   
   public void setTerrain(Terrain terrain) {
     this.terrain = terrain;
+  }
+
+  
+  public House getHouse() {
+    return house;
+  }
+
+  
+  public void setHouse(House house) {
+    this.house = house;
   }
 }

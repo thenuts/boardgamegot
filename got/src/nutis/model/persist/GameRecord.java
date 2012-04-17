@@ -28,7 +28,7 @@ public class GameRecord {
   private Integer card3;
   @OneToMany(cascade={CascadeType.PERSIST}, mappedBy="game")
   private List<HouseRecord> houses = new ArrayList<HouseRecord>();
-  @OneToMany(cascade=CascadeType.PERSIST)
+  @OneToMany(cascade=CascadeType.PERSIST, mappedBy="game")
   private List<AlianceRecord> aliances = new ArrayList<AlianceRecord>();
   
   public String getName() {

@@ -57,7 +57,7 @@ public class Main extends Composite {
     this.gameKey = gameKey;
     canvas = Canvas.createIfSupported();
     context = canvas.getContext2d();
-     canvasPlace.add(canvas);
+    // canvasPlace.add(canvas);
     service.loadGame(gameKey, new DefaultAsyncCallback<LoadGameResultDto>() {
 
       @Override

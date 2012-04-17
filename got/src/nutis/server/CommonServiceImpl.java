@@ -1,7 +1,9 @@
 package nutis.server;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -20,6 +22,7 @@ import nutis.model.core.Unit;
 import nutis.model.core.map.GameMap2003;
 import nutis.model.persist.GameRecord;
 import nutis.model.persist.HouseRecord;
+import nutis.model.persist.OrderRecord;
 import nutis.model.persist.Player;
 
 import com.google.appengine.api.datastore.Key;
@@ -41,7 +44,7 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
       @Override
       public InitializeResultDto execute() {
         InitializeResultDto result = new InitializeResultDto();
-        retorno = result;
+        retorno=result;
         result.setPlayer(getPlayer());
         Player player = readPersistPlayer(result.getPlayer(), em);
         result.setGames(readGames(player.getId(), em));
@@ -56,10 +59,12 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
 
       @Override
       public RetornoPadraoDTO execute() {
+        RetornoPadraoDTO result = new RetornoPadraoDTO();
+        retorno=result;
         Game game = new Game(new GameMap2003());
         game.initialize();
         persistRandomGame(game, em);
-        return null;
+        return result;
       }
     });
   }
@@ -71,11 +76,11 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
       @Override
       public LoadGameResultDto execute() {
         LoadGameResultDto result = new LoadGameResultDto();
-        retorno = result;
-        Player player = readPersistPlayer(getPlayer(), em);
+        retorno=result;
+//        Player player = readPlayer(getPlayer(), em);
         Game game = readGame(key, em);
-        result.setPieceKindCount(20);
-        createPieces(result.getPieces(), game,null);
+        result.setPieceKindCount(44);
+        createPieces(result.getPieces(), game, null);
         return result;
       }
     });
@@ -89,9 +94,9 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
       public PossibleOrdersResultDto execute() {
         PossibleOrdersResultDto result = new PossibleOrdersResultDto();
         retorno = result;
-        Player player = readPersistPlayer(getPlayer(), em);
+        Player player = readPlayer(getPlayer(), em);
         Game game = readGame(gameKey, em);
-        createPieces(result.getPieces(), game,game.getHouse(player.getId()).getType().getId());
+        createPieces(result.getPieces(), game, game.getHouse(player.getId()).getType().getId());
         int kingCourt = game.getHouse(player.getId()).getKingCourt();
         int starCount = game.getMap().getKingsCourt()[kingCourt];
         result.setStarOrders(starCount);
@@ -108,44 +113,82 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
   }
 
   @Override
-  public RetornoPadraoDTO sendOrders(KeyDto gameKey) {
-    // TODO Auto-generated method stub
-    return null;
+  public RetornoPadraoDTO sendOrders(final KeyDto key, final HashMap<Integer, Integer> internalOrders) {
+    return Business.<RetornoPadraoDTO> execute(new ExecutavelComRetorno() {
+
+      @Override
+      public RetornoPadraoDTO execute() {
+        RetornoPadraoDTO result = new RetornoPadraoDTO();
+        retorno=result;
+        //TODO melhorar eficiencia da persistencia acessando a house diretamente atrvés de pk
+        GameRecord gameRecord = em.find(GameRecord.class, KeyFactory.createKey(key.getKind(), key.getId()));
+        Player player = readPlayer(getPlayer(), em);
+        for(HouseRecord house:gameRecord.getHouses()){
+          if(house.getPlayer().equals(player.getId())){
+            for(OrderRecord order:house.getOrders()){
+              em.getTransaction().begin();
+              em.remove(order);
+              em.getTransaction().commit();
+            }
+            for(Map.Entry<Integer, Integer> entry : internalOrders.entrySet()){
+              em.getTransaction().begin();
+              OrderRecord order = new OrderRecord();
+              //TODO revisar relação abaixo
+              order.setTerrain(entry.getKey());
+              order.setOrder(entry.getValue());
+              order.setHouse(house);
+              em.persist(order);
+              em.getTransaction().commit();
+            }
+            break;
+          }
+        }
+        return result;
+      }
+    });
   }
 
   private void createPieces(ArrayList<PieceDto> arrayList, Game game, Integer house) {
     for (Terrain terrain : game.getMap().getLands().values()) {
-      if (terrain.getUnits().size() > 0) {        
-        if(house == null || terrain.getUnits().get(0).getHouse().getType().getId() == house)
-        {
-          PieceDto piece = createPieceDto(game, terrain);
-          arrayList.add(piece);          
+      if (terrain.getUnits().size() > 0) {
+        if (house == null || terrain.getUnits().get(0).getHouse().getType().getId() == house) {
+          HashMap<Integer, HashMap<Integer, Integer>> units = new HashMap<Integer, HashMap<Integer, Integer>>();
+          // house,unit, count
+          for (Unit unit : terrain.getUnits()) {
+            int houseid = unit.getHouse().getType().getId();
+            if (!units.containsKey(houseid)) {
+              units.put(houseid, new HashMap<Integer, Integer>());
+            }
+            int unitid = unit.getType().getId();
+            if (units.get(houseid).containsKey(unitid)) {
+              int count = units.get(houseid).get(unitid);
+              units.get(houseid).put(unitid, count++);
+            } else {
+              units.get(houseid).put(unitid, 1);
+            }
+          }
+          for (Map.Entry<Integer, HashMap<Integer, Integer>> houseUnits : units.entrySet()) {
+            PieceDto piece = new PieceDto();
+            piece.setTerrainId(terrain.getId());
+            piece.setX(terrain.getX());
+            piece.setY(terrain.getY());
+            piece.setHouse(game.getMap().getHouseTypes().get(houseUnits.getKey()).getName());
+            String unitsString = "";
+            for (Map.Entry<Integer, Integer> unit : houseUnits.getValue().entrySet()) {
+              unitsString += unit.getValue() + game.getMap().getUnitTypes().get(unit.getKey()).getInitials() + " ";
+              piece.getPieces().put(
+                  (game.getMap().getHouseTypes().get(houseUnits.getKey()).getId() - 1) * 4 + unit.getKey() - 1,
+                  unit.getValue());
+            }
+            piece.setPiecesText(terrain.getName() + " - " + unitsString);
+            if (terrain.getOrder() != null) {
+              piece.getPieces().put(24 + houseUnits.getKey(), 1);
+            }
+            arrayList.add(piece);
+          }
         }
       }
     }
-  }
-
-  private PieceDto createPieceDto(Game game, Terrain terrain) {
-    PieceDto piece = new PieceDto();
-    piece.setTerrainId(terrain.getId());
-    piece.setX(terrain.getX());
-    piece.setY(terrain.getY());
-    // TODO adaptar código para o combate
-    piece.setHouse(terrain.getUnits().get(0).getHouse().getType().getName());
-    int houseId = terrain.getUnits().get(0).getHouse().getType().getId();
-    int[] units = new int[3];
-    for (Unit unit : terrain.getUnits()) {
-      units[unit.getType().getId() - 1]++;
-    }
-    String unitsString = "";
-    for (int i = 0; i < units.length; i++) {
-      if (units[i] > 0) {
-        unitsString += units[i] + game.getMap().getUnitTypes().get(i + 1).getInitials() + " ";
-        piece.getPieces().put((houseId - 1) * 4 + i , units[i]);
-      }
-    }
-    piece.setPiecesText(terrain.getName() + " - " + unitsString);
-    return piece;
   }
 
   private Game readGame(KeyDto key, EntityManager em) {
@@ -217,6 +260,20 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
         .setParameter("email", email).getResultList();
     if (queryResult.size() == 0) {
       player = persistPlayer(email, em);
+    } else if (queryResult.size() == 1) {
+      player = (Player) queryResult.get(0);
+    } else {
+      throw new IllegalStateException("multiplos cadastros para o mesmo player");
+    }
+    return player;
+  }
+
+  private Player readPlayer(String email, EntityManager em) {
+    Player player;
+    List<?> queryResult = em.createQuery("select from " + Player.class.getName() + " where email=:email")
+        .setParameter("email", email).getResultList();
+    if (queryResult.size() == 0) {
+      player = null;
     } else if (queryResult.size() == 1) {
       player = (Player) queryResult.get(0);
     } else {

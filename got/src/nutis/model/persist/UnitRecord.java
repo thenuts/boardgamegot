@@ -1,9 +1,11 @@
 package nutis.model.persist;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -15,6 +17,8 @@ public class UnitRecord {
   private int terrain;
   private int type;
   private boolean defeated;
+  @ManyToOne(fetch = FetchType.LAZY)
+  private HouseRecord house;
   
   public int getTerrain() {
     return terrain;
@@ -50,5 +54,15 @@ public class UnitRecord {
   
   public void setId(Key id) {
     this.id = id;
+  }
+
+  
+  public HouseRecord getHouse() {
+    return house;
+  }
+
+  
+  public void setHouse(HouseRecord house) {
+    this.house = house;
   }
 }

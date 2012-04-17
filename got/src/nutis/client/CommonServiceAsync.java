@@ -1,5 +1,7 @@
 package nutis.client;
 
+import java.util.HashMap;
+
 import nutis.client.dto.InitializeResultDto;
 import nutis.client.dto.KeyDto;
 import nutis.client.dto.LoadGameResultDto;
@@ -21,5 +23,5 @@ public interface CommonServiceAsync {
 
   void getPossibleOrders(KeyDto gameKey, AsyncCallback<PossibleOrdersResultDto> callback);
 
-  void sendOrders(KeyDto gameKey, AsyncCallback<RetornoPadraoDTO> callback);
+  void sendOrders(KeyDto gameKey, HashMap<Integer, Integer> internalOrders, AsyncCallback<RetornoPadraoDTO> callback);
 }
