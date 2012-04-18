@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nutis.model.persist.HouseRecord;
+import nutis.model.persist.OrderRecord;
 import nutis.model.persist.UnitRecord;
 
 import com.google.appengine.api.datastore.Key;
@@ -125,10 +126,17 @@ public class House {
     for(UnitRecord unit:house.getUnits()){
       result.addUnit(map.getUnitTypes().get(unit.getType()), map.getLands().get(unit.getTerrain()));
     }
+    for(OrderRecord order:house.getOrders()){
+      result.addOrder(map.getOrderTypes().get(order.getOrder()),map.getLands().get(order.getTerrain()));
+    }
     return result;
   }
 
   
+  private void addOrder(Order order, Terrain terrain) {
+    new OrderIssued(order, terrain,this);
+  }
+
   public HouseType getType() {
     return type;
   }

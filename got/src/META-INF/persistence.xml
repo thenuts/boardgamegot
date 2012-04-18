@@ -9,7 +9,7 @@
     <!-- org.datanucleus.api.jpa.PersistenceProviderImpl -->
     <properties>
       <property name="datanucleus.NontransactionalRead" value="true"/>
-      <property name="datanucleus.NontransactionalWrite" value="false"/>
+      <property name="datanucleus.NontransactionalWrite" value="true"/>
       <property name="datanucleus.ConnectionURL" value="appengine"/>
       <property name="datanucleus.appengine.datastoreReadConsistency" value="STRONG"/>
       <!-- desliga o warning de eager loading aonde só é possivel lazy -->

@@ -7,6 +7,15 @@ public class OrderIssued {
   Order type;
   Terrain terrain;
   House house;
+  public OrderIssued(Order order, Terrain terrain, House house) {
+    this.type=order;
+    this.house=house;
+    this.terrain=terrain;
+    
+    terrain.getOrders().add(this);
+    house.getOrders().add(this);
+  }
+
   public OrderRecord getRecord() {
     OrderRecord result = new OrderRecord();
     result.setOrder(this.getType().getId());

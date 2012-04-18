@@ -16,7 +16,9 @@ import nutis.client.dto.PieceDto;
 import nutis.client.dto.PossibleOrdersResultDto;
 import nutis.client.dto.RetornoPadraoDTO;
 import nutis.engine.Game;
+import nutis.model.core.House;
 import nutis.model.core.Order;
+import nutis.model.core.OrderIssued;
 import nutis.model.core.Terrain;
 import nutis.model.core.Unit;
 import nutis.model.core.map.GameMap2003;
@@ -126,19 +128,19 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
         for(HouseRecord house:gameRecord.getHouses()){
           if(house.getPlayer().equals(player.getId())){
             for(OrderRecord order:house.getOrders()){
-              em.getTransaction().begin();
+              //em.getTransaction().begin();
               em.remove(order);
-              em.getTransaction().commit();
+              //em.getTransaction().commit();
             }
             for(Map.Entry<Integer, Integer> entry : internalOrders.entrySet()){
-              em.getTransaction().begin();
+              //em.getTransaction().begin();
               OrderRecord order = new OrderRecord();
               //TODO revisar relação abaixo
               order.setTerrain(entry.getKey());
               order.setOrder(entry.getValue());
               order.setHouse(house);
               em.persist(order);
-              em.getTransaction().commit();
+              //em.getTransaction().commit();
             }
             break;
           }
@@ -148,10 +150,10 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     });
   }
 
-  private void createPieces(ArrayList<PieceDto> arrayList, Game game, Integer house) {
+  private void createPieces(ArrayList<PieceDto> arrayList, Game game, Integer houseId) {
     for (Terrain terrain : game.getMap().getLands().values()) {
       if (terrain.getUnits().size() > 0) {
-        if (house == null || terrain.getUnits().get(0).getHouse().getType().getId() == house) {
+        if (houseId == null || terrain.getUnits().get(0).getHouse().getType().getId() == houseId) {
           HashMap<Integer, HashMap<Integer, Integer>> units = new HashMap<Integer, HashMap<Integer, Integer>>();
           // house,unit, count
           for (Unit unit : terrain.getUnits()) {
@@ -177,12 +179,18 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
             for (Map.Entry<Integer, Integer> unit : houseUnits.getValue().entrySet()) {
               unitsString += unit.getValue() + game.getMap().getUnitTypes().get(unit.getKey()).getInitials() + " ";
               piece.getPieces().put(
-                  (game.getMap().getHouseTypes().get(houseUnits.getKey()).getId() - 1) * 4 + unit.getKey() - 1,
+                  (houseUnits.getKey() - 1) * 4 + unit.getKey() ,
                   unit.getValue());
             }
             piece.setPiecesText(terrain.getName() + " - " + unitsString);
-            if (terrain.getOrder() != null) {
-              piece.getPieces().put(24 + houseUnits.getKey(), 1);
+            House house = terrain.getUnits().get(0).getHouse();
+            if (house.getOrders() != null) {
+              for(OrderIssued order:house.getOrders()){
+                if(order.getTerrain().getId()==terrain.getId()){
+                  piece.getPieces().put(24 + houseUnits.getKey(), 1);
+                  break;
+                }
+              }
             }
             arrayList.add(piece);
           }
@@ -203,7 +211,7 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     Player claudao = readPersistPlayer("claudao@gmail.com", em);
     Player rod = readPersistPlayer("rodmontero@gmail.com", em);
     Player tiago = readPersistPlayer("tiago.caux@gmail.com", em);
-    em.getTransaction().begin();
+//    em.getTransaction().begin();
     GameRecord gameRecord = game.getRecord();
     gameRecord.setName("jogo " + Integer.toString((int) (Math.random() * 100)));
     for (HouseRecord house : gameRecord.getHouses()) {
@@ -228,7 +236,7 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
       }
     }
     em.persist(gameRecord);
-    em.getTransaction().commit();
+//    em.getTransaction().commit();
     return gameRecord;
   }
 
@@ -283,11 +291,11 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
   }
 
   private Player persistPlayer(String playerName, EntityManager em) {
-    em.getTransaction().begin();
+//    em.getTransaction().begin();
     Player player = new Player();
     player.setEmail(playerName);
     em.persist(player);
-    em.getTransaction().commit();
+//    em.getTransaction().commit();
     return player;
   }
 

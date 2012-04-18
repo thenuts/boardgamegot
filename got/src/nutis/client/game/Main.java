@@ -57,14 +57,14 @@ public class Main extends Composite {
     this.gameKey = gameKey;
     canvas = Canvas.createIfSupported();
     context = canvas.getContext2d();
-    // canvasPlace.add(canvas);
+    canvasPlace.add(canvas);
     service.loadGame(gameKey, new DefaultAsyncCallback<LoadGameResultDto>() {
 
       @Override
       public void onSuccess(final LoadGameResultDto result) {
-        for (PieceDto piece : result.getPieces()) {
-          units.add(new Label( piece.getHouse() + "-" + piece.getPiecesText()));
-        }
+//        for (PieceDto piece : result.getPieces()) {
+//          units.add(new Label( piece.getHouse() + "-" + piece.getPiecesText()));
+//        }
         pieceKindCount = result.getPieceKindCount();
         imagePieces = new Image[pieceKindCount];
         for (int i = 0; i < imagePieces.length; i++) {
@@ -83,8 +83,8 @@ public class Main extends Composite {
                 for (PieceDto piece : result.getPieces()) {
                   int i = 0;
                   for (Map.Entry<Integer, Integer> entry : piece.getPieces().entrySet()) {
-                    context.drawImage(imageElementPieces[entry.getKey()], piece.getX() + i, piece.getY());
-                    i += 15;
+                    context.drawImage(imageElementPieces[entry.getKey()-1], piece.getX() + i, piece.getY());
+                    i += 20;
                   }
                 }
               }
