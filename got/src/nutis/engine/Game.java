@@ -16,7 +16,16 @@ import com.google.appengine.api.datastore.Key;
 
 public class Game {
   enum Phase{
-    
+    Planning,//all
+    Raven,//one player
+    Raid,//per player
+    March,//per player
+    Defense,//one player
+    //Consolidade,
+    //westross, supply, order limit, shufle,collect crowns,no suporting footman
+    Mustering,//per player
+    Clash,//all
+    Wildling//all
   };
   Phase phase;
   House house;

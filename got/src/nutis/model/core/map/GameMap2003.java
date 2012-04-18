@@ -196,6 +196,12 @@ public class GameMap2003 extends GameMap {
   
     return houses;
   }
+
+
+@Override
+public int getNumberOfPlayers() {
+	return 5;
+}
   
   
 

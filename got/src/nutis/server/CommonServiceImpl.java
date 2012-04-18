@@ -125,7 +125,11 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
         //TODO melhorar eficiencia da persistencia acessando a house diretamente atrvés de pk
         GameRecord gameRecord = em.find(GameRecord.class, KeyFactory.createKey(key.getKind(), key.getId()));
         Player player = readPlayer(getPlayer(), em);
+        int houseCount=0;
         for(HouseRecord house:gameRecord.getHouses()){
+        	if(house.getOrders().size()>0){
+        		houseCount++;
+        	}
           if(house.getPlayer().equals(player.getId())){
             for(OrderRecord order:house.getOrders()){
               //em.getTransaction().begin();
@@ -144,6 +148,10 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
             }
             break;
           }
+        }
+        Game game = new Game(gameRecord);
+        if(houseCount==game.getMap().getNumberOfPlayers()){
+        	
         }
         return result;
       }
