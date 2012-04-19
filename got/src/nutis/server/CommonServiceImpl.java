@@ -14,9 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import nutis.client.CommonService;
 import nutis.client.dto.GameDto;
+import nutis.client.dto.HouseTrackDto;
 import nutis.client.dto.InitializeResultDto;
 import nutis.client.dto.KeyDto;
 import nutis.client.dto.LoadGameResultDto;
+import nutis.client.dto.Phase;
 import nutis.client.dto.PieceDto;
 import nutis.client.dto.PossibleOrdersResultDto;
 import nutis.client.dto.RetornoPadraoDTO;
@@ -80,22 +82,32 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     });
   }
 
-  @Override
-  public LoadGameResultDto loadGame(final KeyDto key) {
-    return execute(new ExecutavelComRetorno() {
-
-      @Override
-      public LoadGameResultDto execute() {
-        LoadGameResultDto result = new LoadGameResultDto();
-        retorno = result;
-        // Player player = readPlayer(getPlayer(), em);
-        Game game = readGame(key);
-        result.setPieceKindCount(44);
-        createPieces(result.getPieces(), game, null);
-        return result;
-      }
-    });
-  }
+//  @Override
+//  public LoadGameResultDto loadGame(final KeyDto key) {
+//    return execute(new ExecutavelComRetorno() {
+//
+//      @Override
+//      public LoadGameResultDto execute() {
+//        LoadGameResultDto result = new LoadGameResultDto();
+//        retorno = result;
+//        Player player = readPlayer(getPlayer());
+//        Game game = readGame(key);
+//        result.setPhase(game.getPhase());
+//        HouseTrackDto[] houses = new HouseTrackDto[game.getHouses().size()];
+//        for (House house : game.getHouses()) {
+//          houses[house.getType().getId() - 1] = new HouseTrackDto(house.getIronThrone(), house.getFiefdoms(), house
+//              .getKingCourt(), house.getSupplyTrack(), game.getMap().getKingsCourt()[house.getKingCourt()], house
+//              .getType().getColor());
+//        }
+//        result.setHouses(houses);
+//        result.setSupplyTrackValues(game.getMap().getSupplyTrack());
+//        // TODO leitura do numero de peças talvez tenha que ser dinamico avaliar
+//        result.setPieceKindCount(44);
+//        createPieces(result.getPieces(), game, player);
+//        return result;
+//      }
+//    });
+//  }
 
   @Override
   public PossibleOrdersResultDto getPossibleOrders(final KeyDto gameKey) {
@@ -107,7 +119,7 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
         retorno = result;
         Player player = readPlayer(getPlayer());
         Game game = readGame(gameKey);
-        createPieces(result.getPieces(), game, game.getHouse(player.getId()).getType().getId());
+        createPiecesForPossibleOrders(result.getLands(), game, game.getHouse(player.getId()).getType().getId());
         int kingCourt = game.getHouse(player.getId()).getKingCourt();
         int starCount = game.getMap().getKingsCourt()[kingCourt];
         result.setStarOrders(starCount);
@@ -166,48 +178,76 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     });
   }
 
-  private void createPieces(ArrayList<PieceDto> arrayList, Game game, Integer houseId) {
+  private void createPiecesForPossibleOrders(HashMap<Integer, String> lands, Game game, Integer houseId) {
     for (Terrain terrain : game.getMap().getLands().values()) {
       if (terrain.getUnits().size() > 0) {
-        if (houseId == null || terrain.getUnits().get(0).getHouse().getType().getId() == houseId) {
-          HashMap<Integer, HashMap<Integer, Integer>> units = new HashMap<Integer, HashMap<Integer, Integer>>();
-          // house,unit, count
+        if (terrain.getUnits().get(0).getHouse().getType().getId() == houseId) {
+          HashMap<Integer, Integer> units = new HashMap<Integer, Integer>();
+          // unit, count
           for (Unit unit : terrain.getUnits()) {
-            int houseid = unit.getHouse().getType().getId();
-            if (!units.containsKey(houseid)) {
-              units.put(houseid, new HashMap<Integer, Integer>());
-            }
             int unitid = unit.getType().getId();
-            if (units.get(houseid).containsKey(unitid)) {
-              int count = units.get(houseid).get(unitid);
-              units.get(houseid).put(unitid, count++);
+            if (units.containsKey(unitid)) {
+              int count = units.get(unitid);
+              units.put(unitid, count++);
             } else {
-              units.get(houseid).put(unitid, 1);
+              units.put(unitid, 1);
             }
           }
-          for (Map.Entry<Integer, HashMap<Integer, Integer>> houseUnits : units.entrySet()) {
-            PieceDto piece = new PieceDto();
-            piece.setTerrainId(terrain.getId());
-            piece.setX(terrain.getX());
-            piece.setY(terrain.getY());
-            piece.setHouse(game.getMap().getHouseTypes().get(houseUnits.getKey()).getName());
-            String unitsString = "";
-            for (Map.Entry<Integer, Integer> unit : houseUnits.getValue().entrySet()) {
-              unitsString += unit.getValue() + game.getMap().getUnitTypes().get(unit.getKey()).getInitials() + " ";
-              piece.getPieces().put((houseUnits.getKey() - 1) * 4 + unit.getKey(), unit.getValue());
-            }
-            piece.setPiecesText(terrain.getName() + " - " + unitsString);
-            House house = terrain.getUnits().get(0).getHouse();
-            if (house.getOrders() != null) {
-              for (OrderIssued order : house.getOrders()) {
-                if (order.getTerrain().getId() == terrain.getId()) {
+          int key = terrain.getId();
+          String unitsString = "";
+          for (Map.Entry<Integer, Integer> unit : units.entrySet()) {
+            unitsString += unit.getValue() + game.getMap().getUnitTypes().get(unit.getKey()).getInitials() + " ";
+          }
+          unitsString = terrain.getName() + " - " + unitsString;
+          lands.put(key, unitsString);
+        }
+      }
+    }
+  }
+  private void createPieces(ArrayList<PieceDto> arrayList, Game game, Player player) {
+    for (Terrain terrain : game.getMap().getLands().values()) {
+      if (terrain.getUnits().size() > 0) {
+        HashMap<Integer, HashMap<Integer, Integer>> units = new HashMap<Integer, HashMap<Integer, Integer>>();
+        // house,unit, count
+        for (Unit unit : terrain.getUnits()) {
+          int houseid = unit.getHouse().getType().getId();
+          if (!units.containsKey(houseid)) {
+            units.put(houseid, new HashMap<Integer, Integer>());
+          }
+          int unitid = unit.getType().getId();
+          if (units.get(houseid).containsKey(unitid)) {
+            int count = units.get(houseid).get(unitid);
+            units.get(houseid).put(unitid, count++);
+          } else {
+            units.get(houseid).put(unitid, 1);
+          }
+        }
+        for (Map.Entry<Integer, HashMap<Integer, Integer>> houseUnits : units.entrySet()) {
+          PieceDto piece = new PieceDto();
+          piece.setTerrainId(terrain.getId());
+          piece.setX(terrain.getX());
+          piece.setY(terrain.getY());
+          piece.setHouse(game.getMap().getHouseTypes().get(houseUnits.getKey()).getName());
+          String unitsString = "";
+          for (Map.Entry<Integer, Integer> unit : houseUnits.getValue().entrySet()) {
+            unitsString += unit.getValue() + game.getMap().getUnitTypes().get(unit.getKey()).getInitials() + " ";
+            piece.getPieces().put((houseUnits.getKey() - 1) * 4 + unit.getKey(), unit.getValue());
+          }
+          piece.setPiecesText(terrain.getName() + " - " + unitsString);
+          House house = terrain.getUnits().get(0).getHouse();
+          if (house.getOrders() != null) {
+            for (OrderIssued order : house.getOrders()) {
+              if (order.getTerrain().getId() == terrain.getId()) {
+                if (!player.getId().equals(house.getPlayer()) && game.getPhase() == Phase.Planning) {
                   piece.getPieces().put(24 + houseUnits.getKey(), 1);
-                  break;
+                } else {
+                  piece.getPieces().put(29 + order.getType().getId(), 1);
                 }
+                break;
               }
             }
-            arrayList.add(piece);
           }
+          arrayList.add(piece);
         }
       }
     }

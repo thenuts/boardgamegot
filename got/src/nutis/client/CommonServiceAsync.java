@@ -19,9 +19,7 @@ public interface CommonServiceAsync {
 
   void createGame(AsyncCallback<RetornoPadraoDTO> callback);
 
-  void loadGame(KeyDto keyDTO, AsyncCallback<LoadGameResultDto> callback);
+  void sendOrders(KeyDto gameKey, HashMap<Integer, Integer> internalOrders, AsyncCallback<RetornoPadraoDTO> callback);
 
   void getPossibleOrders(KeyDto gameKey, AsyncCallback<PossibleOrdersResultDto> callback);
-
-  void sendOrders(KeyDto gameKey, HashMap<Integer, Integer> internalOrders, AsyncCallback<RetornoPadraoDTO> callback);
 }

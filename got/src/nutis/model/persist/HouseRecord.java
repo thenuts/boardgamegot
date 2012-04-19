@@ -24,7 +24,7 @@ public class HouseRecord {
   private int powerTokens; 
   private int supplyTrack;
   private int ironThrone;
-  private int fifdoms;
+  private int fiefdoms;
   private int kingCourt;
   private Integer bid;
   private Integer combatCard;
@@ -80,11 +80,11 @@ public class HouseRecord {
   }
   
   public int getFifdoms() {
-    return fifdoms;
+    return fiefdoms;
   }
   
-  public void setFifdoms(int fifdoms) {
-    this.fifdoms = fifdoms;
+  public void setFiefdoms(int fiefdoms) {
+    this.fiefdoms = fiefdoms;
   }
   
   public int getKingCourt() {

@@ -18,7 +18,7 @@ public class GameRecord {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Key id;
   private String name;
-  
+  private String mapType;
   private int turn;
   private int phase;
   private int wildlings;
@@ -136,6 +136,16 @@ public class GameRecord {
   
   public void setAliances(List<AlianceRecord> aliances) {
     this.aliances = aliances;
+  }
+
+  
+  public String getMapType() {
+    return mapType;
+  }
+
+  
+  public void setMapType(String mapType) {
+    this.mapType = mapType;
   }
 
   

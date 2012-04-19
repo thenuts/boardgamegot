@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 
 public class HouseTrackDto implements Serializable{
-  private static final long serialVersionUID = 892394754373722350L;
+  private static final long serialVersionUID = 892394754373322350L;
   
   String houseColor;
   int ironThrone;

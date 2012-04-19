@@ -21,7 +21,7 @@ public interface CommonService extends RemoteService {
 
   RetornoPadraoDTO createGame();
 
-  LoadGameResultDto loadGame(KeyDto gameKey);
+//  LoadGameResultDto loadGame(KeyDto gameKey);
 
   PossibleOrdersResultDto getPossibleOrders(KeyDto gameKey);
 

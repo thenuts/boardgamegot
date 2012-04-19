@@ -2,6 +2,7 @@ package nutis.client.game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import nutis.client.CommonService;
 import nutis.client.CommonServiceAsync;
@@ -74,11 +75,11 @@ public class Planning extends DecoratedPopupPanel {
         for (OrderDto order : ordersList) {
           orders.addItem(order.getName(), Integer.toString(order.getId()));
         }
-        for (final PieceDto piece : result.getPieces()) {
+        for (final Map.Entry<Integer,String> land : result.getLands().entrySet()) {
           DockLayoutPanel panel = new DockLayoutPanel(Unit.PX);
           panel.setHeight("30px");
           panel.setWidth("280px");
-          final Label label = new Label(piece.getPiecesText());
+          final Label label = new Label(land.getValue());
           panel.addWest(label, 250);
           final Button button = new Button("<<");
           button.addClickHandler(new ClickHandler() {
@@ -88,7 +89,7 @@ public class Planning extends DecoratedPopupPanel {
               if (button.getText().equals("<<")) {
                 if (orders.getSelectedValue() != null) {
                   int id = Integer.parseInt(orders.getSelectedValue());
-                  internalOrders.put(piece.getTerrainId(), id);
+                  internalOrders.put(land.getKey(), id);
                   button.setText(">>");
                   label.setText(label.getText() + " - " + orders.getSelectedText());
                   orders.removeSelected();
@@ -105,10 +106,10 @@ public class Planning extends DecoratedPopupPanel {
                 }
               } else {
                 button.setText("<<");
-                int id = internalOrders.get(piece.getTerrainId());
+                int id = internalOrders.get(land.getValue());
                 OrderDto o = getOrderById(id);
                 orders.addItem(o.getName(), Integer.toString(o.getId()));
-                label.setText(piece.getPiecesText());
+                label.setText(land.getValue());
                 if (getOrderById(id).isStar() && starUsed==result.getStarOrders()) {
                   for (OrderDto order : ordersList) {
                     if (order.isStar() && !isOrderInternal(order.getId())) {
@@ -116,7 +117,7 @@ public class Planning extends DecoratedPopupPanel {
                     }
                   }
                 }
-                internalOrders.remove(piece.getTerrainId());
+                internalOrders.remove(land.getKey());
                 starUsed--;
               }
             }

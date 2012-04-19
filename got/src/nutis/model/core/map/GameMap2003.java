@@ -19,11 +19,11 @@ public class GameMap2003 extends GameMap {
     supplyTrack = new int[][]{{2,2},{3,2},{3,2,2},{3,2,2,2},{3,3,2,2},{4,3,2,2},{4,3,2,2,2} };
     kingsCourt = new int[]{3,3,2,1,0,0};
     
-    HouseType stark = new HouseType(1,"Stark");
-    HouseType greyjoy = new HouseType(2,"Greyjoy");
-    HouseType lanister = new HouseType(3,"Lannister");
-    HouseType baratheon = new HouseType(4,"Baratheon");
-    HouseType tyrell = new HouseType(5,"Tyrell");   
+    HouseType stark = new HouseType(1,"Stark","#808080");
+    HouseType greyjoy = new HouseType(2,"Greyjoy","#000000");
+    HouseType lanister = new HouseType(3,"Lannister","#a40000");
+    HouseType baratheon = new HouseType(4,"Baratheon","#a4a400");
+    HouseType tyrell = new HouseType(5,"Tyrell","#006000");   
     addHouseType(stark);   
     addHouseType(greyjoy);   
     addHouseType(lanister);   
@@ -200,7 +200,7 @@ public class GameMap2003 extends GameMap {
 
 @Override
 public int getNumberOfPlayers() {
-	return 5;
+  return 5;
 }
   
   

@@ -58,43 +58,43 @@ public class Main extends Composite {
     canvas = Canvas.createIfSupported();
     context = canvas.getContext2d();
     canvasPlace.add(canvas);
-    service.loadGame(gameKey, new DefaultAsyncCallback<LoadGameResultDto>() {
-
-      @Override
-      public void onSuccess(final LoadGameResultDto result) {
-//        for (PieceDto piece : result.getPieces()) {
-//          units.add(new Label( piece.getHouse() + "-" + piece.getPiecesText()));
+//    service.loadGame(gameKey, new DefaultAsyncCallback<LoadGameResultDto>() {
+//
+//      @Override
+//      public void onSuccess(final LoadGameResultDto result) {
+////        for (PieceDto piece : result.getPieces()) {
+////          units.add(new Label( piece.getHouse() + "-" + piece.getPiecesText()));
+////        }
+//        pieceKindCount = result.getPieceKindCount();
+//        imagePieces = new Image[pieceKindCount];
+//        for (int i = 0; i < imagePieces.length; i++) {
+//          imagePieces[i] = new Image("/images/piece" + (i+1)+".png");
+//          imagePieces[i].addLoadHandler(new LoadHandler() {
+//
+//            @Override
+//            public void onLoad(LoadEvent event) {
+//              imageLoadCount++;
+//              if (imageLoadCount == (pieceKindCount+1)) {
+//                imageElementPieces = new ImageElement[pieceKindCount];
+//                for (int i = 0; i < imagePieces.length; i++) {
+//                  imageElementPieces[i] = (ImageElement) imagePieces[i].getElement().cast();
+//                }
+//                context.drawImage(imageMap, 0, 0);
+//                for (PieceDto piece : result.getPieces()) {
+//                  int i = 0;
+//                  for (Map.Entry<Integer, Integer> entry : piece.getPieces().entrySet()) {
+//                    context.drawImage(imageElementPieces[entry.getKey()-1], piece.getX() + i, piece.getY());
+//                    i += 20;
+//                  }
+//                }
+//              }
+//            }
+//          });
+//          imagePieces[i].setVisible(false);
+//          canvasPlace.add(imagePieces[i]);
 //        }
-        pieceKindCount = result.getPieceKindCount();
-        imagePieces = new Image[pieceKindCount];
-        for (int i = 0; i < imagePieces.length; i++) {
-          imagePieces[i] = new Image("/images/piece" + (i+1)+".png");
-          imagePieces[i].addLoadHandler(new LoadHandler() {
-
-            @Override
-            public void onLoad(LoadEvent event) {
-              imageLoadCount++;
-              if (imageLoadCount == (pieceKindCount+1)) {
-                imageElementPieces = new ImageElement[pieceKindCount];
-                for (int i = 0; i < imagePieces.length; i++) {
-                  imageElementPieces[i] = (ImageElement) imagePieces[i].getElement().cast();
-                }
-                context.drawImage(imageMap, 0, 0);
-                for (PieceDto piece : result.getPieces()) {
-                  int i = 0;
-                  for (Map.Entry<Integer, Integer> entry : piece.getPieces().entrySet()) {
-                    context.drawImage(imageElementPieces[entry.getKey()-1], piece.getX() + i, piece.getY());
-                    i += 20;
-                  }
-                }
-              }
-            }
-          });
-          imagePieces[i].setVisible(false);
-          canvasPlace.add(imagePieces[i]);
-        }
-      }
-    });
+//      }
+//    });
   }
 
   @UiHandler("planning")

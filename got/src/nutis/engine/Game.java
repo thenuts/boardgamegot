@@ -3,6 +3,7 @@ package nutis.engine;
 import java.util.ArrayList;
 import java.util.List;
 
+import nutis.client.dto.Phase;
 import nutis.model.core.Aliance;
 import nutis.model.core.GameMap;
 import nutis.model.core.House;
@@ -15,18 +16,8 @@ import com.google.appengine.api.datastore.Key;
 
 
 public class Game {
-  enum Phase{
-    Planning,//all
-    Raven,//one player
-    Raid,//per player
-    March,//per player
-    Defense,//one player
-    //Consolidade,
-    //westross, supply, order limit, shufle,collect crowns,no suporting footman
-    Mustering,//per player
-    Clash,//all
-    Wildling//all
-  };
+  
+  
   Phase phase;
   House house;
   
@@ -44,12 +35,15 @@ public class Game {
   
   public Game(GameMap map){
     this.map=map;
+    phase = Phase.Planning;
   }
   
   public Game(GameRecord gameRecord) {
+    //TODO aceitar varios mapas no record
     map = new GameMap2003();
     this.name = gameRecord.getName();
     this.turn = gameRecord.getTurn();
+    this.phase = Phase.fromInt(gameRecord.getPhase());
     this.wildlings = gameRecord.getWildlings();
     houses = new ArrayList<House>();
     for(HouseRecord house:gameRecord.getHouses()){
@@ -214,10 +208,25 @@ public class Game {
 
   public GameRecord getRecord() {
     GameRecord result = new GameRecord();
+    result.setName(name);
+    result.setTurn(turn);
+    result.setPhase(phase.getValue());
+    result.setWildlings(wildlings);
+    result.setMapType(map.getClass().getName());
     for (House house : getHouses()) {
       result.getHouses().add(house.getRecord());
     }
     return result;
+  }
+
+  
+  public Phase getPhase() {
+    return phase;
+  }
+
+  
+  public void setPhase(Phase phase) {
+    this.phase = phase;
   }
   
 }

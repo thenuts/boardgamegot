@@ -15,7 +15,7 @@ public class House {
   private int powerTokens; //limit 20
   private int supplyTrack;
   private int ironThrone;
-  private int fifdoms;
+  private int fiefdoms;
   private int kingCourt;
   private HouseType type;
   private List<HouseCard> cards=new ArrayList<HouseCard>();
@@ -24,11 +24,11 @@ public class House {
   private List<OrderIssued> orders=new ArrayList<OrderIssued>();
   private Key player;
 
-  public House(HouseType type, int supplyTrack, int ironThrone, int fifdoms, int kingCourt) {
+  public House(HouseType type, int supplyTrack, int ironThrone, int fiefdoms, int kingCourt) {
     this.type=type;
     this.supplyTrack=supplyTrack;
     this.ironThrone=ironThrone;
-    this.fifdoms=fifdoms;
+    this.fiefdoms=fiefdoms;
     this.kingCourt=kingCourt;
     
     powerTokens=5;
@@ -56,14 +56,6 @@ public class House {
   
   public void setIronThrone(int ironThrone) {
     this.ironThrone = ironThrone;
-  }
-  
-  public int getFifdoms() {
-    return fifdoms;
-  }
-  
-  public void setFifdoms(int fifdoms) {
-    this.fifdoms = fifdoms;
   }
   
   public int getKingCourt() {
@@ -94,7 +86,7 @@ public class House {
     HouseRecord result = new HouseRecord();
     result.setPowerTokens(this.getPowerTokens());
     result.setIronThrone(this.getIronThrone());
-    result.setFifdoms(this.getFifdoms());
+    result.setFiefdoms(this.getFiefdoms());
     result.setKingCourt(this.getKingCourt());
     result.setSupplyTrack(this.getSupplyTrack());
     result.setHouse(this.getType().getId());
@@ -149,6 +141,11 @@ public class House {
   
   public void setPlayer(Key player) {
     this.player = player;
+  }
+
+  
+  public int getFiefdoms() {
+    return fiefdoms;
   }
 
 }
