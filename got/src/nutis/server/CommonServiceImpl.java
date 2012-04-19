@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import nutis.client.CommonService;
 import nutis.client.dto.GameDto;
@@ -39,17 +44,21 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 @SuppressWarnings("serial")
 public class CommonServiceImpl extends RemoteServiceServlet implements CommonService {
 
+  final static Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
+  private static final EntityManagerFactory emfInstance = Persistence
+      .createEntityManagerFactory("transactions-optional");
+
   @Override
   public InitializeResultDto initialize() {
-    return Business.<InitializeResultDto> execute(new ExecutavelComRetorno() {
+    return execute(new ExecutavelComRetorno() {
 
       @Override
       public InitializeResultDto execute() {
         InitializeResultDto result = new InitializeResultDto();
-        retorno=result;
+        retorno = result;
         result.setPlayer(getPlayer());
-        Player player = readPersistPlayer(result.getPlayer(), em);
-        result.setGames(readGames(player.getId(), em));
+        Player player = readPersistPlayer(result.getPlayer());
+        result.setGames(readGames(player.getId()));
         return result;
       }
     });
@@ -57,15 +66,15 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
 
   @Override
   public RetornoPadraoDTO createGame() {
-    return Business.<RetornoPadraoDTO> execute(new ExecutavelComRetorno() {
+    return execute(new ExecutavelComRetorno() {
 
       @Override
       public RetornoPadraoDTO execute() {
         RetornoPadraoDTO result = new RetornoPadraoDTO();
-        retorno=result;
+        retorno = result;
         Game game = new Game(new GameMap2003());
         game.initialize();
-        persistRandomGame(game, em);
+        persistRandomGame(game);
         return result;
       }
     });
@@ -73,14 +82,14 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
 
   @Override
   public LoadGameResultDto loadGame(final KeyDto key) {
-    return Business.<LoadGameResultDto> execute(new ExecutavelComRetorno() {
+    return execute(new ExecutavelComRetorno() {
 
       @Override
       public LoadGameResultDto execute() {
         LoadGameResultDto result = new LoadGameResultDto();
-        retorno=result;
-//        Player player = readPlayer(getPlayer(), em);
-        Game game = readGame(key, em);
+        retorno = result;
+        // Player player = readPlayer(getPlayer(), em);
+        Game game = readGame(key);
         result.setPieceKindCount(44);
         createPieces(result.getPieces(), game, null);
         return result;
@@ -90,14 +99,14 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
 
   @Override
   public PossibleOrdersResultDto getPossibleOrders(final KeyDto gameKey) {
-    return Business.<PossibleOrdersResultDto> execute(new ExecutavelComRetorno() {
+    return execute(new ExecutavelComRetorno() {
 
       @Override
       public PossibleOrdersResultDto execute() {
         PossibleOrdersResultDto result = new PossibleOrdersResultDto();
         retorno = result;
-        Player player = readPlayer(getPlayer(), em);
-        Game game = readGame(gameKey, em);
+        Player player = readPlayer(getPlayer());
+        Game game = readGame(gameKey);
         createPieces(result.getPieces(), game, game.getHouse(player.getId()).getType().getId());
         int kingCourt = game.getHouse(player.getId()).getKingCourt();
         int starCount = game.getMap().getKingsCourt()[kingCourt];
@@ -116,42 +125,41 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
 
   @Override
   public RetornoPadraoDTO sendOrders(final KeyDto key, final HashMap<Integer, Integer> internalOrders) {
-    return Business.<RetornoPadraoDTO> execute(new ExecutavelComRetorno() {
+    return execute(new ExecutavelComRetorno() {
 
       @Override
       public RetornoPadraoDTO execute() {
         RetornoPadraoDTO result = new RetornoPadraoDTO();
-        retorno=result;
-        //TODO melhorar eficiencia da persistencia acessando a house diretamente atrvés de pk
+        retorno = result;
+        // TODO melhorar eficiencia da persistencia acessando a house diretamente atrvés de pk
         GameRecord gameRecord = em.find(GameRecord.class, KeyFactory.createKey(key.getKind(), key.getId()));
-        Player player = readPlayer(getPlayer(), em);
-        int houseCount=0;
-        for(HouseRecord house:gameRecord.getHouses()){
-        	if(house.getOrders().size()>0){
-        		houseCount++;
-        	}
-          if(house.getPlayer().equals(player.getId())){
-            for(OrderRecord order:house.getOrders()){
-              //em.getTransaction().begin();
+        Player player = readPlayer(getPlayer());
+        int houseCount = 0;
+        for (HouseRecord house : gameRecord.getHouses()) {
+          if (house.getOrders().size() > 0) {
+            houseCount++;
+          }
+          if (house.getPlayer().equals(player.getId())) {
+            for (OrderRecord order : house.getOrders()) {
+              // em.getTransaction().begin();
               em.remove(order);
-              //em.getTransaction().commit();
+              // em.getTransaction().commit();
             }
-            for(Map.Entry<Integer, Integer> entry : internalOrders.entrySet()){
-              //em.getTransaction().begin();
+            for (Map.Entry<Integer, Integer> entry : internalOrders.entrySet()) {
+              // em.getTransaction().begin();
               OrderRecord order = new OrderRecord();
-              //TODO revisar relação abaixo
+              // TODO revisar relação abaixo
               order.setTerrain(entry.getKey());
               order.setOrder(entry.getValue());
               order.setHouse(house);
               em.persist(order);
-              //em.getTransaction().commit();
+              // em.getTransaction().commit();
             }
             break;
           }
         }
         Game game = new Game(gameRecord);
-        if(houseCount==game.getMap().getNumberOfPlayers()){
-        	
+        if (houseCount == game.getMap().getNumberOfPlayers()) {
         }
         return result;
       }
@@ -186,15 +194,13 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
             String unitsString = "";
             for (Map.Entry<Integer, Integer> unit : houseUnits.getValue().entrySet()) {
               unitsString += unit.getValue() + game.getMap().getUnitTypes().get(unit.getKey()).getInitials() + " ";
-              piece.getPieces().put(
-                  (houseUnits.getKey() - 1) * 4 + unit.getKey() ,
-                  unit.getValue());
+              piece.getPieces().put((houseUnits.getKey() - 1) * 4 + unit.getKey(), unit.getValue());
             }
             piece.setPiecesText(terrain.getName() + " - " + unitsString);
             House house = terrain.getUnits().get(0).getHouse();
             if (house.getOrders() != null) {
-              for(OrderIssued order:house.getOrders()){
-                if(order.getTerrain().getId()==terrain.getId()){
+              for (OrderIssued order : house.getOrders()) {
+                if (order.getTerrain().getId() == terrain.getId()) {
                   piece.getPieces().put(24 + houseUnits.getKey(), 1);
                   break;
                 }
@@ -207,19 +213,19 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     }
   }
 
-  private Game readGame(KeyDto key, EntityManager em) {
+  private Game readGame(KeyDto key) {
     GameRecord gameRecord = em.find(GameRecord.class, KeyFactory.createKey(key.getKind(), key.getId()));
     Game game = new Game(gameRecord);
     return game;
   }
 
-  private GameRecord persistRandomGame(Game game, EntityManager em) {
-    Player guilherme = readPersistPlayer("oguilherme@gmail.com", em);
-    Player divino = readPersistPlayer("divinonpassos@gmail.com", em);
-    Player claudao = readPersistPlayer("claudao@gmail.com", em);
-    Player rod = readPersistPlayer("rodmontero@gmail.com", em);
-    Player tiago = readPersistPlayer("tiago.caux@gmail.com", em);
-//    em.getTransaction().begin();
+  private GameRecord persistRandomGame(Game game) {
+    Player guilherme = readPersistPlayer("oguilherme@gmail.com");
+    Player divino = readPersistPlayer("divinonpassos@gmail.com");
+    Player claudao = readPersistPlayer("claudao@gmail.com");
+    Player rod = readPersistPlayer("rodmontero@gmail.com");
+    Player tiago = readPersistPlayer("tiago.caux@gmail.com");
+    // em.getTransaction().begin();
     GameRecord gameRecord = game.getRecord();
     gameRecord.setName("jogo " + Integer.toString((int) (Math.random() * 100)));
     for (HouseRecord house : gameRecord.getHouses()) {
@@ -244,12 +250,12 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
       }
     }
     em.persist(gameRecord);
-//    em.getTransaction().commit();
+    // em.getTransaction().commit();
     return gameRecord;
   }
 
   @SuppressWarnings("unchecked")
-  private ArrayList<GameDto> readGames(Key key, EntityManager em) {
+  private ArrayList<GameDto> readGames(Key key) {
     ArrayList<GameDto> result = null;
     List<?> queryResult = em.createQuery("select from " + HouseRecord.class.getName() + " where player=:player")
         .setParameter("player", key).getResultList();
@@ -269,13 +275,13 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     return result;
   }
 
-  private Player readPersistPlayer(String email, EntityManager em) {
+  private Player readPersistPlayer(String email) {
     Player player;
     player = null;
     List<?> queryResult = em.createQuery("select from " + Player.class.getName() + " where email=:email")
         .setParameter("email", email).getResultList();
     if (queryResult.size() == 0) {
-      player = persistPlayer(email, em);
+      player = persistPlayer(email);
     } else if (queryResult.size() == 1) {
       player = (Player) queryResult.get(0);
     } else {
@@ -284,7 +290,7 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     return player;
   }
 
-  private Player readPlayer(String email, EntityManager em) {
+  private Player readPlayer(String email) {
     Player player;
     List<?> queryResult = em.createQuery("select from " + Player.class.getName() + " where email=:email")
         .setParameter("email", email).getResultList();
@@ -298,12 +304,14 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     return player;
   }
 
-  private Player persistPlayer(String playerName, EntityManager em) {
-//    em.getTransaction().begin();
+  private Player persistPlayer(String playerName) {
+    // em.getTransaction().begin();
     Player player = new Player();
     player.setEmail(playerName);
     em.persist(player);
-//    em.getTransaction().commit();
+    em.close();
+    em = emfInstance.createEntityManager();
+    // em.getTransaction().commit();
     return player;
   }
 
@@ -314,5 +322,46 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     } else {
       throw new IllegalStateException("este serviço não deveria ter sido chamada sem que o usuário esteja logado");
     }
+  }
+
+  static EntityManager em = null;
+
+  /**
+   * <p>
+   * Método requisitados para operações com mensagem e outros dados que outros dados que forem necessários.
+   * </p>
+   * <p>
+   * Para isso, uma nova classe deverá ser criado com essas propriedades, herdando de {@link RetornoPadraoDTO}
+   * </p>
+   * 
+   * @param executavel
+   *          - Classe anômica com o método que irá executar
+   * @return {@link RetornoPadraoDTO}
+   */
+  // TODO estranho esse uncecked pois o RetornoPadraoDTO esta no extends do T
+  @SuppressWarnings("unchecked")
+  public static <T extends RetornoPadraoDTO> T execute(ExecutavelComRetorno run) {
+    try {
+      em = emfInstance.createEntityManager();
+      run.setEntityManager(em);
+      run.execute();
+    } catch (Throwable e) {
+      if (e.getMessage() != null) {
+        run.getRetorno().setMensagemDeErro(e.getMessage().split("\n"));
+      }
+      // TODO logger não esta funcionando no ambiente de desenvolvimento, analisar
+      System.out.println(e.getMessage());
+      logger.error(e.getMessage(), e);
+    } finally {
+      if (em != null) {
+        if (em.isOpen()) {
+          if (em.getTransaction().isActive()) {
+            em.getTransaction().rollback();
+          }
+          em.close();
+        }
+      }
+    }
+    return (T) run.getRetorno();
   }
 }
