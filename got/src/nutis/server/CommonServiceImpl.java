@@ -343,7 +343,6 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
   public static <T extends RetornoPadraoDTO> T execute(ExecutavelComRetorno run) {
     try {
       em = emfInstance.createEntityManager();
-      run.setEntityManager(em);
       run.execute();
     } catch (Throwable e) {
       if (e.getMessage() != null) {

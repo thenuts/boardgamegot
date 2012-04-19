@@ -8,7 +8,6 @@ import nutis.client.dto.RetornoPadraoDTO;
 public abstract class ExecutavelComRetorno {
 
   protected RetornoPadraoDTO retorno;
-  protected EntityManager em;
 
   public abstract RetornoPadraoDTO execute();
 
@@ -16,7 +15,4 @@ public abstract class ExecutavelComRetorno {
     return retorno;
   }
 
-  public void setEntityManager(EntityManager em) {
-    this.em=em;
-  }
 }
