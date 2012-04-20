@@ -79,12 +79,12 @@ public class GameRecord {
   }
 
   
-  public int getHouse() {
+  public Integer getHouse() {
     return house;
   }
 
   
-  public void setHouse(int house) {
+  public void setHouse(Integer house) {
     this.house = house;
   }
 

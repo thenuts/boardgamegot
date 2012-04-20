@@ -7,6 +7,7 @@ import nutis.client.CommonServiceAsync;
 import nutis.client.DefaultAsyncCallback;
 import nutis.client.dto.KeyDto;
 import nutis.client.dto.LoadGameResultDto;
+import nutis.client.dto.Phase;
 import nutis.client.dto.PieceDto;
 
 import com.google.gwt.canvas.client.Canvas;
@@ -31,7 +32,7 @@ import com.google.gwt.user.client.ui.Widget;
 public class Main extends Composite {
 
   @UiField
-  Button planning;
+  Button phaseOrder;
   @UiField
   VerticalPanel units;
   @UiField
@@ -49,58 +50,71 @@ public class Main extends Composite {
   private static MainUiBinder uiBinder = GWT.create(MainUiBinder.class);
   private ImageElement imageMap;
 
+  private Phase phase;
+
   interface MainUiBinder extends UiBinder<Widget, Main> {
   }
 
   public Main(KeyDto gameKey) {
     initWidget(uiBinder.createAndBindUi(this));
+    
     this.gameKey = gameKey;
     canvas = Canvas.createIfSupported();
     context = canvas.getContext2d();
     canvasPlace.add(canvas);
-//    service.loadGame(gameKey, new DefaultAsyncCallback<LoadGameResultDto>() {
-//
-//      @Override
-//      public void onSuccess(final LoadGameResultDto result) {
-////        for (PieceDto piece : result.getPieces()) {
-////          units.add(new Label( piece.getHouse() + "-" + piece.getPiecesText()));
-////        }
-//        pieceKindCount = result.getPieceKindCount();
-//        imagePieces = new Image[pieceKindCount];
-//        for (int i = 0; i < imagePieces.length; i++) {
-//          imagePieces[i] = new Image("/images/piece" + (i+1)+".png");
-//          imagePieces[i].addLoadHandler(new LoadHandler() {
-//
-//            @Override
-//            public void onLoad(LoadEvent event) {
-//              imageLoadCount++;
-//              if (imageLoadCount == (pieceKindCount+1)) {
-//                imageElementPieces = new ImageElement[pieceKindCount];
-//                for (int i = 0; i < imagePieces.length; i++) {
-//                  imageElementPieces[i] = (ImageElement) imagePieces[i].getElement().cast();
-//                }
-//                context.drawImage(imageMap, 0, 0);
-//                for (PieceDto piece : result.getPieces()) {
-//                  int i = 0;
-//                  for (Map.Entry<Integer, Integer> entry : piece.getPieces().entrySet()) {
-//                    context.drawImage(imageElementPieces[entry.getKey()-1], piece.getX() + i, piece.getY());
-//                    i += 20;
-//                  }
-//                }
-//              }
-//            }
-//          });
-//          imagePieces[i].setVisible(false);
-//          canvasPlace.add(imagePieces[i]);
+    service.loadGame(gameKey, new DefaultAsyncCallback<LoadGameResultDto>() {
+
+      @Override
+      public void onSuccess(final LoadGameResultDto result) {
+//        for (PieceDto piece : result.getPieces()) {
+//          units.add(new Label( piece.getHouse() + "-" + piece.getPiecesText()));
 //        }
-//      }
-//    });
+        phase=result.getPhase();
+        if(phase==Phase.Planning){
+          phaseOrder.setText("Planning");
+        }else if(phase==Phase.March){
+          phaseOrder.setText("March");          
+        }
+        pieceKindCount = result.getPieceKindCount();
+        imagePieces = new Image[pieceKindCount];
+        for (int i = 0; i < imagePieces.length; i++) {
+          imagePieces[i] = new Image("/images/piece" + (i+1)+".png");
+          imagePieces[i].addLoadHandler(new LoadHandler() {
+
+            @Override
+            public void onLoad(LoadEvent event) {
+              imageLoadCount++;
+              if (imageLoadCount == (pieceKindCount+1)) {
+                imageElementPieces = new ImageElement[pieceKindCount];
+                for (int i = 0; i < imagePieces.length; i++) {
+                  imageElementPieces[i] = (ImageElement) imagePieces[i].getElement().cast();
+                }
+                context.drawImage(imageMap, 0, 0);
+                for (PieceDto piece : result.getPieces()) {
+                  int i = 0;
+                  for (Map.Entry<Integer, Integer> entry : piece.getPieces().entrySet()) {
+                    context.drawImage(imageElementPieces[entry.getKey()-1], piece.getX() + i, piece.getY());
+                    i += 20;
+                  }
+                }
+              }
+            }
+          });
+          imagePieces[i].setVisible(false);
+          canvasPlace.add(imagePieces[i]);
+        }
+      }
+    });
   }
 
-  @UiHandler("planning")
+  @UiHandler("phaseOrder")
   void planningClick(ClickEvent event) {
-    Planning planningPopup = new Planning(gameKey);
-    planningPopup.center();
+    if(phase==Phase.Planning){
+      Planning planningPopup = new Planning(gameKey);
+      planningPopup.center();
+    }else if(phase==Phase.March){
+      
+    }
   }
 
   @UiHandler("map")

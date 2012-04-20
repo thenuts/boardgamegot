@@ -113,7 +113,7 @@ public class House {
 
   public static House fromRecord(HouseRecord house,GameMap map) {
     House result = new House(map.getHouseTypes().get(house.getHouse()), house.getSupplyTrack(), 
-        house.getIronThrone(), house.getFifdoms(), house.getKingCourt());
+        house.getIronThrone(), house.getFiefdoms(), house.getKingCourt());
     result.setPlayer(house.getPlayer());
     for(UnitRecord unit:house.getUnits()){
       result.addUnit(map.getUnitTypes().get(unit.getType()), map.getLands().get(unit.getTerrain()));

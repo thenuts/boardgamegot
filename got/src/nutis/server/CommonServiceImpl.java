@@ -82,32 +82,32 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
     });
   }
 
-//  @Override
-//  public LoadGameResultDto loadGame(final KeyDto key) {
-//    return execute(new ExecutavelComRetorno() {
-//
-//      @Override
-//      public LoadGameResultDto execute() {
-//        LoadGameResultDto result = new LoadGameResultDto();
-//        retorno = result;
-//        Player player = readPlayer(getPlayer());
-//        Game game = readGame(key);
-//        result.setPhase(game.getPhase());
-//        HouseTrackDto[] houses = new HouseTrackDto[game.getHouses().size()];
-//        for (House house : game.getHouses()) {
-//          houses[house.getType().getId() - 1] = new HouseTrackDto(house.getIronThrone(), house.getFiefdoms(), house
-//              .getKingCourt(), house.getSupplyTrack(), game.getMap().getKingsCourt()[house.getKingCourt()], house
-//              .getType().getColor());
-//        }
-//        result.setHouses(houses);
-//        result.setSupplyTrackValues(game.getMap().getSupplyTrack());
-//        // TODO leitura do numero de peças talvez tenha que ser dinamico avaliar
-//        result.setPieceKindCount(44);
-//        createPieces(result.getPieces(), game, player);
-//        return result;
-//      }
-//    });
-//  }
+  // @Override
+  public LoadGameResultDto loadGame(final KeyDto key) {
+    return execute(new ExecutavelComRetorno() {
+
+      @Override
+      public LoadGameResultDto execute() {
+        LoadGameResultDto result = new LoadGameResultDto();
+        retorno = result;
+        Player player = readPlayer(getPlayer());
+        Game game = readGame(key);
+        result.setPhase(game.getPhase());
+        HouseTrackDto[] houses = new HouseTrackDto[game.getHouses().size()];
+        for (House house : game.getHouses()) {
+          houses[house.getType().getId() - 1] = new HouseTrackDto(house.getIronThrone(), house.getFiefdoms(),
+              house.getKingCourt(), house.getSupplyTrack(), game.getMap().getKingsCourt()[house.getKingCourt()], house
+                  .getType().getColor());
+        }
+        // result.setHouses(houses);
+        result.setSupplyTrackValues(game.getMap().getSupplyTrack());
+        // TODO leitura do numero de peças talvez tenha que ser dinamico avaliar
+        result.setPieceKindCount(44);
+        createPieces(result.getPieces(), game, player);
+        return result;
+      }
+    });
+  }
 
   @Override
   public PossibleOrdersResultDto getPossibleOrders(final KeyDto gameKey) {
@@ -150,28 +150,51 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
         for (HouseRecord house : gameRecord.getHouses()) {
           if (house.getOrders().size() > 0) {
             houseCount++;
-          }
-          if (house.getPlayer().equals(player.getId())) {
-            for (OrderRecord order : house.getOrders()) {
-              // em.getTransaction().begin();
-              em.remove(order);
-              // em.getTransaction().commit();
+            if (house.getPlayer().equals(player.getId())) {
+              for (OrderRecord order : house.getOrders()) {
+                em.remove(order);
+              }
+              for (Map.Entry<Integer, Integer> entry : internalOrders.entrySet()) {
+                OrderRecord order = new OrderRecord();
+                // TODO revisar relação abaixo
+                order.setTerrain(entry.getKey());
+                order.setOrder(entry.getValue());
+                order.setHouse(house);
+                em.persist(order);
+              }
             }
-            for (Map.Entry<Integer, Integer> entry : internalOrders.entrySet()) {
-              // em.getTransaction().begin();
-              OrderRecord order = new OrderRecord();
-              // TODO revisar relação abaixo
-              order.setTerrain(entry.getKey());
-              order.setOrder(entry.getValue());
-              order.setHouse(house);
-              em.persist(order);
-              // em.getTransaction().commit();
-            }
-            break;
           }
         }
         Game game = new Game(gameRecord);
         if (houseCount == game.getMap().getNumberOfPlayers()) {
+          // TODO colocar a ordem correta de fase
+          game.setPhase(Phase.March);
+          House house=null;
+          for(int i=1;i<=game.getMap().getNumberOfPlayers();i++){
+            house=game.getIronThrone(i);
+            boolean found = false;
+            for(OrderIssued order:house.getOrders()){
+              if(order.getType().getName().equals("March")){
+                found=true;
+                break;
+              }
+            }
+            if(found){
+              break;
+            }else{
+              house=null;
+            }
+            
+          }
+          if(house==null){
+            //TODO apagaque todas as ordens
+          }else{
+            game.setHouse(house);
+          }
+          // TODO melhorar gambi para ler a chave
+          GameRecord gameRecord2 = game.getRecord();
+          gameRecord2.setId(gameRecord.getId());
+          em.merge(gameRecord2);
         }
         return result;
       }
@@ -204,6 +227,7 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
       }
     }
   }
+
   private void createPieces(ArrayList<PieceDto> arrayList, Game game, Player player) {
     for (Terrain terrain : game.getMap().getLands().values()) {
       if (terrain.getUnits().size() > 0) {
@@ -389,7 +413,7 @@ public class CommonServiceImpl extends RemoteServiceServlet implements CommonSer
         run.getRetorno().setMensagemDeErro(e.getMessage().split("\n"));
       }
       // TODO logger não esta funcionando no ambiente de desenvolvimento, analisar
-      System.out.println(e.getMessage());
+      e.printStackTrace();
       logger.error(e.getMessage(), e);
     } finally {
       if (em != null) {

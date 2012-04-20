@@ -13,7 +13,8 @@
       <g:HorizontalPanel>
         <g:VerticalPanel ui:field="units"/>
         <g:VerticalPanel>
-          <g:Button ui:field="planning" text="planning"/>
+          <g:Button ui:field="aliance" text="Aliance"/>
+          <g:Button ui:field="phaseOrder" text="Planning"/>
         </g:VerticalPanel>
       </g:HorizontalPanel>
     </g:east>

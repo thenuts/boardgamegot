@@ -79,7 +79,7 @@ public class HouseRecord {
     this.ironThrone = ironThrone;
   }
   
-  public int getFifdoms() {
+  public int getFiefdoms() {
     return fiefdoms;
   }
   

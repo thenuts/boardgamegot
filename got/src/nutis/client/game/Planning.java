@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -153,12 +154,14 @@ public class Planning extends DecoratedPopupPanel {
 
   @UiHandler("save")
   void saveClick(ClickEvent e) {
-    hide();
+
      service.sendOrders(gameKey,internalOrders, new DefaultAsyncCallback<RetornoPadraoDTO>() {
     
      @Override
      public void onSuccess(RetornoPadraoDTO result) {
-     // TODO fechar popup
+       hide();
+       RootLayoutPanel.get().clear();
+       RootLayoutPanel.get().add(new Main(gameKey));
     
      }
     
